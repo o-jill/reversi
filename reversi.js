@@ -286,8 +286,9 @@ function movestr(c, x, y, tb, ts)
 function onClick(e)
 {
   if(!e) e = window.event; // ÉåÉKÉVÅ[
-  let mousex = e.clientX-canvas.offsetLeft;
-  let mousey = e.clientY-canvas.offsetTop;
+  let rect = e.target.getBoundingClientRect();
+  let mousex = e.clientX-rect.left;
+  let mousey = e.clientY-rect.top;
   let x = mousex-offset;
   let y = mousey-offset;
   if (x < 0 || x >= cellsize*NUMCELL || y < 0 || y >= cellsize*NUMCELL) {
