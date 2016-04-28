@@ -1,1 +1,18 @@
-aaa 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <title>reversi</title>
+    <meta charset="shift_jis">
+</head>
+<body>
+<div>
+    <canvas id='mycanvas' width='410' height='410' onclick="onClick()"></canvas>
+</div>
+<input id='eval' value='----'><button onclick="hint()">hint</button>&nbsp;<button onclick="COMmove()">COM move</button>&nbsp;<button onclick="COMmoveR()">COM moveR</button><BR>
+<label onclick="AutoCOMMove()"><input type="checkbox" id='acmchk'>AutoComMove</label>
+<textarea id='kifu'></textarea><BR>
+<textarea id='hintt'>---</textarea><BR>
+<button onclick="init()">init</button>
+
+<script type="text/javascript" src="reversi.js"></script>
+</body></html>
