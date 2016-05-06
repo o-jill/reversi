@@ -266,7 +266,7 @@ function move(c, x, y, t)
   reverse(c, x, y);
 }
 
-function movestr(c, x, y, tb, ts)
+function movestr(c, x, y, tb, ts, kms)
 {
   let cnt = count(c);
   let str = ts.toString(10) + "手目 " + (x+1).toString(10) + (y+1).toString(10);
@@ -278,6 +278,14 @@ function movestr(c, x, y, tb, ts)
     str += "終了";
   }
   str += cnt.toString(10);
+  if (tb !== BLANK) {
+    str += " ";
+    if (kms != null && kms > 0)
+      // str += kms.toString(10) + "局面";
+      str += kms.toLocaleString() + "局面";
+    else
+      str += "1億3手";
+  }
   str += "\n";
 
   return str;
@@ -304,7 +312,7 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu);
+        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man*/);
 
         ++tesuu;
         // 手番変更
@@ -725,7 +733,7 @@ function hintNr(n)
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
   hinto = genandeval(hinto, cells, teban, n);
 
-  return [hinto.best, 0];
+  return [hinto.best, hinto.kyokumensu];
 }
 
 
@@ -751,7 +759,7 @@ function COMmove()
   }
   move(cells, x, y, teban);
 
-  kifu.value += movestr(cells, x, y, teban, tesuu);
+  kifu.value += movestr(cells, x, y, teban, tesuu, 3);
 
   ++tesuu;
   // 手番変更
@@ -769,17 +777,17 @@ function COMmove()
 
 function COMmoveR()
 {
-  let hinto = hintNr(7);
+  let [hinto, kyokumensu] = hintNr(7);
 
-  if (hinto.length === 0)
-    return;
+//  if (hinto.length === 0)
+//    return;
 
   let x, y;
-  x = hinto[0].x;
-  y = hinto[0].y;
+  x = hinto.x;
+  y = hinto.y;
   move(cells, x, y, teban);
 
-  kifu.value += movestr(cells, x, y, teban, tesuu);
+  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu);
 
   ++tesuu;
   // 手番変更
