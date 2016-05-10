@@ -266,7 +266,7 @@ function move(c, x, y, t)
   reverse(c, x, y);
 }
 
-function movestr(c, x, y, tb, ts, kms)
+function movestr(c, x, y, tb, ts, kms, tm)
 {
   let cnt = count(c);
   let str = ts.toString(10) + "éËñ⁄ " + (x+1).toString(10) + (y+1).toString(10);
@@ -286,6 +286,11 @@ function movestr(c, x, y, tb, ts, kms)
     else
       str += "1â≠3éË";
   }
+
+  if (tm != null && tm >= 0) {
+    str += tm + "msec";
+  }
+
   str += "\n";
 
   return str;
@@ -312,7 +317,7 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man*/);
+        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man*/, 0);
 
         ++tesuu;
         // éËî‘ïœçX
@@ -744,6 +749,7 @@ function checkResign()
 
 function COMmove()
 {
+  let starttime = new Date().getTime();
   let hinto = hint3();
 
   if (hinto.length === 0)
@@ -759,7 +765,10 @@ function COMmove()
   }
   move(cells, x, y, teban);
 
-  kifu.value += movestr(cells, x, y, teban, tesuu, 3);
+  let finishtime = new Date().getTime();
+  let duration = finishtime - starttime;
+
+  kifu.value += movestr(cells, x, y, teban, tesuu, 3, duration);
 
   ++tesuu;
   // éËî‘ïœçX
@@ -777,6 +786,7 @@ function COMmove()
 
 function COMmoveR()
 {
+  let starttime = new Date().getTime();
   let [hinto, kyokumensu] = hintNr(7);
 
 //  if (hinto.length === 0)
@@ -787,7 +797,10 @@ function COMmoveR()
   y = hinto.y;
   move(cells, x, y, teban);
 
-  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu);
+  let finishtime = new Date().getTime();
+  let duration = finishtime - starttime;
+
+  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
 
   ++tesuu;
   // éËî‘ïœçX
