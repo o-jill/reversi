@@ -1,3 +1,8 @@
+//
+// this file should be beasutified!!
+//
+//
+
 function Sleep(Tmsec) {
   var d1 = new Date().getTime();
   var d2 = new Date().getTime();
@@ -7,8 +12,8 @@ function Sleep(Tmsec) {
   return;
 }
 
-const SENTE = 1;
-const GOTE = -1;
+// const SENTE = 1;
+// const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
 
@@ -223,9 +228,12 @@ function genandeval(node, c, teban, depth)
 
   let child = genmove(c, teban);
   node.child = child;
-  if (child.length == 0) {
-     let val = count(c)*100;
+  if (child.length == 0) {  // éwÇµéËñ≥Çµ Å‡ ÉpÉX
+    node.kyokumensu = 1;
+    let val = count(c)*100;
+    return val;
   }
+
   let celltmp = new Array(NUMCELL*NUMCELL);
   let sum  = 0;
   for (let i = 0 ; i < node.child.length ; ++i) {
@@ -244,7 +252,9 @@ function genandeval(node, c, teban, depth)
     }
     sum += child[i].kyokumensu;
   }
+
   node.kyokumensu = sum;
+
   return node;
 }
 
@@ -269,7 +279,7 @@ onmessage = function (e) {
 
   let starttime = new Date().getTime();
 
-  let [hinto, kyokumensu] = hintNr(cells, teban, 7);
+  let [hinto, kyokumensu] = hintNr(cells, teban, depth);
 
   let finishtime = new Date().getTime();
   let duration = finishtime - starttime;

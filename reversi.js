@@ -29,7 +29,7 @@ var teban = SENTE;
 var autocommove = 0;
 var atcomchk = document.getElementById('acmchk');
 var tesuu = 1;
-var kifustr = "";
+// var kifustr = "";
 
 var enableclick = true;
 var workerthread = new Worker('reversi_engine.js');
@@ -76,25 +76,6 @@ function count(c)
   let sum = 0;
   for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
     sum += c[i];
-  }
-  return sum;
-}
-
-var evaltbl = [
-  10,-5,5,3,3,5,-5,10,
-  -5,-5,1,1,1,1,-5,-5,
-  5,1,1,1,1,1,1,5,
-  3,1,1,0,0,1,1,3,
-  3,1,1,0,0,1,1,3,
-  5,1,1,1,1,1,1,5,
-  -5,-5,1,1,1,1,-5,-5,
-  10,-5,5,3,3,5,-5,10];
-
-function evaluate(c)
-{
-  let sum = 0;
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
-    sum += evaltbl[i]*c[i];
   }
   return sum;
 }
@@ -360,8 +341,6 @@ function onClick(e)
   // inp.value = evaluate(cells).toString(10) + "," + strteban();
 }
 
-var celltmp = new Array(NUMCELL*NUMCELL);
-
 
 /**
  * @param c ”Õ‚Ìî•ñ
@@ -551,206 +530,6 @@ function genmove(c, tbn)
   return te;
 }
 
-/** 1Žè“Ç‚Ý */
-function hint()
-{
-  let hinto = genmove(cells, teban);
-  let str = hinto.length;
-  for (let i = 0 ; i < hinto.length ; ++i) {
-    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-      celltmp[j] = cells[j];
-    }
-    let x = hinto[i].x;
-    let y = hinto[i].y;
-    celltmp[x+y*NUMCELL] = teban;
-    reverse(celltmp, x, y, teban);
-    let val = evaluate(celltmp);
-    hinto[i].hyoka = val;
-  }
-  hinto.sort(function(a, b) {
-    if (a.hyoka > b.hyoka)
-      return -1;
-    if (a.hyoka < b.hyoka)
-      return 1;
-    return 0;
-  });
-  for (let i = 0 ; i < hinto.length ; ++i) {
-    let x = hinto[i].x;
-    let y = hinto[i].y;
-    let val = hinto[i].hyoka;
-    str = str + "(" + x.toString(10) + "," + y.toString(10) + "," + val + "), ";
-  }
-  hintt.value = str;
-
-  return hinto;
-}
-
-
-/** 2Žè“Ç‚Ý */
-function hint2()
-{
-  let hinto = genmove(cells, teban);
-  let celltmp2 = new Array(NUMCELL*NUMCELL);
-  for (let i = 0 ; i < hinto.length ; ++i) {
-    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-      celltmp[j] = cells[j];
-    }
-    let x = hinto[i].x;
-    let y = hinto[i].y;
-    move(celltmp, x, y, teban);
-
-    hinto[i].child = genmove(celltmp, -teban);
-    if (hinto[i].child.length === 0) {
-      let val = evaluate(celltmp);
-      hinto[i].hyoka = val;
-      hinto[i].best = hinto[i];
-    } else {
-      for (let k = 0 ; k < hinto[i].child.length ; ++k) {
-        for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-          celltmp2[j] = celltmp[j];
-        }
-        let x = hinto[i].child[k].x;
-        let y = hinto[i].child[k].y;
-        move(celltmp2, x, y, -teban);
-        let val = evaluate(celltmp2);
-        hinto[i].child[k].hyoka = val;
-        if (hinto[i].best == null || hinto[i].best.hyoka < -val) {
-          hinto[i].best = hinto[i].child[k];
-        }
-      }
-    }
-  }
-  hinto.sort(function(a, b) {
-    if (a.best.hyoka > b.best.hyoka)
-      return -1;
-    if (a.hyoka < b.hyoka)
-      return 1;
-    return 0;
-  });
-
-  return hinto;
-}
-
-/** 3Žè“Ç‚Ý */
-function hint3()
-{
-  let hinto = genmove(cells, teban);
-  let celltmp2 = new Array(NUMCELL*NUMCELL);
-  let celltmp3 = new Array(NUMCELL*NUMCELL);
-  for (let i = 0 ; i < hinto.length ; ++i) {
-    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-      celltmp[j] = cells[j];
-    }
-    let x = hinto[i].x;
-    let y = hinto[i].y;
-    move(celltmp, x, y, teban);
-
-    hinto[i].child = genmove(celltmp, -teban);
-    if (hinto[i].child.length === 0) {
-      let val = evaluate(celltmp);
-      hinto[i].hyoka = val;
-      hinto[i].best = hinto[i];
-    } else {
-      for (let k = 0 ; k < hinto[i].child.length ; ++k) {
-        for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-          celltmp2[j] = celltmp[j];
-        }
-        let x = hinto[i].child[k].x;
-        let y = hinto[i].child[k].y;
-        move(celltmp2, x, y, -teban);
-
-        hinto[i].child[k].child = genmove(celltmp2, teban);
-        if (hinto[i].child[k].child.length === 0) {
-          let val = evaluate(celltmp2);
-          hinto[i].child[k].hyoka = val;
-          hinto[i].child[k].best = hinto[i].child[k];
-        } else {
-          for (let l = 0 ; l < hinto[i].child[k].child.length ; ++l) {
-            for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-              celltmp3[j] = celltmp2[j];
-            }
-            let x = hinto[i].child[k].child[l].x;
-            let y = hinto[i].child[k].child[l].y;
-            move(celltmp3, x, y, teban);
-
-            let val = evaluate(celltmp3);
-            hinto[i].child[k].child[l].hyoka = val;
-            if (hinto[i].child[k].best == null || hinto[i].child[k].best.hyoka < val) {
-              hinto[i].child[k].best = hinto[i].child[k].child[l];
-            }
-          }
-        }
-        if (hinto[i].best == null || hinto[i].best.hyoka < hinto[i].child[k].best.hyoka) {
-          hinto[i].best = hinto[i].child[k];
-        }
-      }
-    }
-  }
-  hinto.sort(function(a, b) {
-    if (a.best.hyoka > b.best.hyoka)
-      return -1;
-    if (a.hyoka < b.hyoka)
-      return 1;
-    return 0;
-  });
-
-  return hinto;
-}
-
-/* “Ç‚Ý‚ÆŽwŽè‚Ì¶¬ */
-function genandeval(node, c, teban, depth)
-{
-  if (depth == 0) {
-    node.kyokumensu = 1;
-    return evaluate(c);
-  }
-
-  let child = genmove(c, teban);
-  node.child = child;
-  if (child.length == 0) {
-     let val = count(c)*100;
-  }
-  let celltmp = new Array(NUMCELL*NUMCELL);
-  let sum  = 0;
-  for (let i = 0 ; i < node.child.length ; ++i) {
-    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
-      celltmp[j] = c[j];
-    }
-    let x = child[i].x;
-    let y = child[i].y;
-    move(celltmp, x, y, teban);
-
-    let val =  genandeval(child[i], c, -teban, depth-1);
-    child[i].hyoka = val;
-    if (node.best == null || node.best.hyoka*teban < val*teban) {
-      node.best = node.child[i];
-      node.hyoka = node.best.hyoka;
-    }
-    sum += child[i].kyokumensu;
-  }
-  node.kyokumensu = sum;
-  return node;
-}
-
-/** 3Žè“Ç‚Ý */
-function hint3r()
-{
-  let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
-  hinto = genandeval(hinto, cells, teban, 3);
-
-  return [hinto.best, 0];
-}
-
-/** NŽè“Ç‚Ý */
-function hintNr(n)
-{
-  let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
-  hinto = genandeval(hinto, cells, teban, n);
-
-  return [hinto.best, hinto.kyokumensu];
-}
-
-
 function checkResign()
 {
     // ‚æ‚­‚í‚©‚ç‚ñ‚Ì‚Å‰„Šú
@@ -758,38 +537,12 @@ function checkResign()
 
 function COMmove()
 {
-  let starttime = new Date().getTime();
-  let hinto = hint3();
+  enableclick = false;
+  prgs.style.display = 'none';
+  prgsm.style.display = 'block';
 
-  if (hinto.length === 0)
-    return;
+  workerthread.postMessage({cells:cells, teban:teban, depth:3});
 
-  let x, y;
-  if (teban == SENTE) {
-    x = hinto[0].x;
-    y = hinto[0].y;
-  } else {
-    x = hinto[hinto.length-1].x;
-    y = hinto[hinto.length-1].y;
-  }
-  move(cells, x, y, teban);
-
-  let finishtime = new Date().getTime();
-  let duration = finishtime - starttime;
-
-  kifu.value += movestr(cells, x, y, teban, tesuu, 3, duration);
-
-  ++tesuu;
-  // Žè”Ô•ÏX
-  if (teban == SENTE) {
-    teban = GOTE;
-  } else if (teban == GOTE) {
-    if (tesuu >= NUMCELL*NUMCELL-4) {
-      teban = BLANK;
-    } else {
-      teban = SENTE;
-    }
-  }
   draw();
 }
 
@@ -798,37 +551,10 @@ function COMmoveR()
   enableclick = false;
   prgs.style.display = 'none';
   prgsm.style.display = 'block';
+
   workerthread.postMessage({cells:cells, teban:teban, depth:7});
-if (false) {
-  let starttime = new Date().getTime();
-  let [hinto, kyokumensu] = hintNr(7);
 
-//  if (hinto.length === 0)
-//    return;
-
-  let x, y;
-  x = hinto.x;
-  y = hinto.y;
-  move(cells, x, y, teban);
-
-  let finishtime = new Date().getTime();
-  let duration = finishtime - starttime;
-
-  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
-
-  ++tesuu;
-  // Žè”Ô•ÏX
-  if (teban == SENTE) {
-    teban = GOTE;
-  } else if (teban == GOTE) {
-    if (tesuu >= NUMCELL*NUMCELL-4) {
-      teban = BLANK;
-    } else {
-      teban = SENTE;
-    }
-  }
   draw();
-}  // if (false)
 }
 
 function init()
@@ -837,8 +563,8 @@ function init()
   0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,
-  0,0,0,1,-1,0,0,0,
-  0,0,0,-1,1,0,0,0,
+  0,0,0,SENTE,GOTE,0,0,0,
+  0,0,0,GOTE,SENTE,0,0,0,
   0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0];
@@ -846,7 +572,7 @@ function init()
   teban = SENTE;
 
   tesuu = 1;
-  kifustr = "";
+  // kifustr = "";
 
   kifu.value = "";
   inp.value = "";
