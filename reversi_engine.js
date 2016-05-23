@@ -1,4 +1,21 @@
-//aaaa
+// if (1) {
+
+function Sleep(Tmsec) {
+  var d1 = new Date().getTime();
+  var d2 = new Date().getTime();
+  while (d2 < d1+Tmsec) {  // wait T msec.
+    d2 = new Date().getTime();
+  }
+  return;
+}
+
+onmessage = function (e) {
+Sleep(3000);
+this.postMessage({});
+};
+// } else {
+
+/*   /aaaa
 
 const canvas = document.getElementById('mycanvas');
 var ctx = canvas.getContext('2d');
@@ -14,7 +31,7 @@ const BLANK = 0;
 const NUMCELL = 8;
 
 
-/* 1:黒,0:なし,-1:白*/
+/* 1:黒,0:なし,-1:白* /
 var cells = [
   0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,
@@ -32,10 +49,6 @@ var tesuu = 1;
 var kifustr = "";
 
 var enableclick = true;
-var workerthread = new Worker('reversi_engine.js');
-const prgs = document.getElementById('prgs');
-const prgsm = document.getElementById('prgs2');
-
 
 function draw()
 {
@@ -325,7 +338,7 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man*/, 0);
+        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man* /, 0);
 
         ++tesuu;
         // 手番変更
@@ -367,7 +380,7 @@ var celltmp = new Array(NUMCELL*NUMCELL);
  * @param xc チェックする座標
  * @param yc チェックする座標
  * @param color 石の色
- */
+ * /
 function checkreverse(c, xc, yc, color)
 {
   let i, j = false;
@@ -550,7 +563,7 @@ function genmove(c, tbn)
   return te;
 }
 
-/** 1手読み */
+/** 1手読み * /
 function hint()
 {
   let hinto = genmove(cells, teban);
@@ -585,7 +598,7 @@ function hint()
 }
 
 
-/** 2手読み */
+/** 2手読み * /
 function hint2()
 {
   let hinto = genmove(cells, teban);
@@ -630,7 +643,7 @@ function hint2()
   return hinto;
 }
 
-/** 3手読み */
+/** 3手読み * /
 function hint3()
 {
   let hinto = genmove(cells, teban);
@@ -696,7 +709,7 @@ function hint3()
   return hinto;
 }
 
-/* 読みと指手の生成 */
+/* 読みと指手の生成 * /
 function genandeval(node, c, teban, depth)
 {
   if (depth == 0) {
@@ -731,7 +744,7 @@ function genandeval(node, c, teban, depth)
   return node;
 }
 
-/** 3手読み */
+/** 3手読み * /
 function hint3r()
 {
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
@@ -740,7 +753,7 @@ function hint3r()
   return [hinto.best, 0];
 }
 
-/** N手読み */
+/** N手読み * /
 function hintNr(n)
 {
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
@@ -794,11 +807,6 @@ function COMmove()
 
 function COMmoveR()
 {
-  enableclick = false;
-  prgs.style.display = 'none';
-  prgsm.style.display = 'block';
-  workerthread.postMessage({event:"start"});
-
   let starttime = new Date().getTime();
   let [hinto, kyokumensu] = hintNr(7);
 
@@ -857,16 +865,11 @@ function AutoCOMMove()
   inp.text = "" + autocommove;
 }
 
-workerthread.onmessage = function(e)
-{
-  enableclick = true;
-  prgs.style.display = 'block';
-  prgsm.style.display = 'none';
-}
-
 function ___init()
 {
     draw();
 }
 
 ___init();
+* */
+// }
