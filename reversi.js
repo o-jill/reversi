@@ -294,6 +294,7 @@ function movestr(c, x, y, tb, ts, kms, tm)
   }
 
   if (tm != null && tm >= 0) {
+    str += " ";
     str += tm + "msec";
   }
 
@@ -797,8 +798,8 @@ function COMmoveR()
   enableclick = false;
   prgs.style.display = 'none';
   prgsm.style.display = 'block';
-  workerthread.postMessage({event:"start"});
-
+  workerthread.postMessage({cells:cells, teban:teban, depth:7});
+if (false) {
   let starttime = new Date().getTime();
   let [hinto, kyokumensu] = hintNr(7);
 
@@ -827,6 +828,7 @@ function COMmoveR()
     }
   }
   draw();
+}  // if (false)
 }
 
 function init()
@@ -859,6 +861,34 @@ function AutoCOMMove()
 
 workerthread.onmessage = function(e)
 {
+  let hinto = e.data.hinto;
+  let kyokumensu = e.data.kyokumensu;
+  let duration = e.data.duration;
+
+  let x = -1, y = -1;
+  if (hinto != null) {
+    x = hinto.x;
+    y = hinto.y;
+    move(cells, x, y, teban);
+  } else {
+    // pass
+  }
+
+  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
+
+  ++tesuu;
+  // Žè”Ô•ÏX
+  if (teban == SENTE) {
+    teban = GOTE;
+  } else if (teban == GOTE) {
+    if (tesuu >= NUMCELL*NUMCELL-4) {
+      teban = BLANK;
+    } else {
+      teban = SENTE;
+    }
+  }
+  draw();
+
   enableclick = true;
   prgs.style.display = 'block';
   prgsm.style.display = 'none';
