@@ -1,4 +1,6 @@
-//aaaa
+/**
+ * @fileoverview reversi gui interfaces
+ */
 
 const canvas = document.getElementById('mycanvas');
 var ctx = canvas.getContext('2d');
@@ -16,14 +18,14 @@ const NUMCELL = 8;
 
 /* 1:黒,0:なし,-1:白*/
 var cells = [
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,1,-1,0,0,0,
-  0,0,0,-1,1,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0];
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, SENTE, GOTE, 0, 0, 0,
+  0, 0, 0, GOTE, SENTE, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0];
 
 var teban = SENTE;
 var autocommove = 0;
@@ -58,14 +60,17 @@ function draw()
       if (cells[x+y*NUMCELL] == SENTE) {
         ctx.fillStyle = "black";
         ctx.beginPath();
-        ctx.arc(offset+cellsize*x+cellsize*0.5, offset+cellsize*y+cellsize*0.5, cellsize*0.5, 0, Math.PI*2, true);
+        ctx.arc(offset+cellsize*x+cellsize*0.5, offset+cellsize*y+cellsize*0.5,
+                cellsize*0.5, 0, Math.PI*2, true);
         ctx.fill();
       } else if (cells[x+y*NUMCELL] == GOTE) {
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(offset+cellsize*x+cellsize*0.5, offset+cellsize*y+cellsize*0.5, cellsize*0.5, 0, Math.PI*2, true);
+        ctx.arc(offset+cellsize*x+cellsize*0.5, offset+cellsize*y+cellsize*0.5,
+                cellsize*0.5, 0, Math.PI*2, true);
         ctx.fill();
       } else {
+        // never come
       }
     }
   }
@@ -87,7 +92,7 @@ function reverse(c, xc, yc)
   let val;
 
   // 左
-  for (i = xc ; i !== 0 ;){
+  for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
     if (val == color) {
@@ -105,7 +110,7 @@ function reverse(c, xc, yc)
 
   // 右
   j = -1;
-  for (i = xc+1 ; i < NUMCELL ; ++i){
+  for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
     if (val == color) {
       j = i;
@@ -122,7 +127,7 @@ function reverse(c, xc, yc)
 
   // 上
   j = -1;
-  for (i = yc ; i !== 0 ;){
+  for (i = yc ; i !== 0 ;) {
     --i;
     val = c[xc+NUMCELL*i];
     if (val == color) {
@@ -140,7 +145,7 @@ function reverse(c, xc, yc)
 
   // 下
   j = -1;
-  for (i = yc+1 ; i < NUMCELL ; ++i){
+  for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
     if (val == color) {
       j = i;
@@ -157,7 +162,7 @@ function reverse(c, xc, yc)
 
   // 左上
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc-i < 0) {
       break;
     }
@@ -177,7 +182,7 @@ function reverse(c, xc, yc)
 
   // 右上
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc-i < 0) {
       break;
     }
@@ -197,7 +202,7 @@ function reverse(c, xc, yc)
 
   // 右下
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
       break;
     }
@@ -216,7 +221,7 @@ function reverse(c, xc, yc)
   }
 
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc+i >= NUMCELL) {
       break;
     }
@@ -255,8 +260,13 @@ function move(c, x, y, t)
 
 function movestr(c, x, y, tb, ts, kms, tm)
 {
-  let cnt = count(c);
-  let str = ts.toString(10) + "手目 " + (x+1).toString(10) + (y+1).toString(10);
+  let str = ts.toString(10) + "手目 ";
+  if (x <= 0 || y <= 0) {
+    // pass
+  } else {
+    str + (x+1).toString(10) + (y+1).toString(10);
+  }
+
   if (tb == SENTE) {
     str += "黒 ";
   } else if (tb == GOTE) {
@@ -264,7 +274,10 @@ function movestr(c, x, y, tb, ts, kms, tm)
   } else {
     str += "終了";
   }
+
+  let cnt = count(c);
   str += cnt.toString(10);
+
   if (tb !== BLANK) {
     str += " ";
     if (kms != null && kms > 0)
@@ -307,7 +320,7 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/*man*/, 0);
+        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0);
 
         ++tesuu;
         // 手番変更
@@ -334,7 +347,7 @@ function onClick(e)
     }
 
     draw();
-    //if (teban != BLANK && autocommmove !== 0)
+    // if (teban != BLANK && autocommmove !== 0)
     if (atcomchk.checked == true)
       COMmoveR();
   }
@@ -492,7 +505,7 @@ function checkreverse(c, xc, yc, color)
   // ←↓
   j = false;
   rev = false;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc+i >= NUMCELL) {
       break;
     }
@@ -523,7 +536,7 @@ function genmove(c, tbn)
       x = i%NUMCELL;
       y = (i-x)/NUMCELL;
       if (checkreverse(c, x, y, tbn)) {
-          te.push({x: x, y: y, hyoka: 9999, child:null});
+        te.push({x: x, y: y, hyoka: 9999, child:null});
       }
     }
   }
@@ -560,14 +573,14 @@ function COMmoveR()
 function init()
 {
   cells = [
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,SENTE,GOTE,0,0,0,
-  0,0,0,GOTE,SENTE,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0];
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, SENTE, GOTE, 0, 0, 0,
+    0, 0, 0, GOTE, SENTE, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0];
 
   teban = SENTE;
 
@@ -595,6 +608,11 @@ workerthread.onmessage = function(e)
   if (hinto != null) {
     x = hinto.x;
     y = hinto.y;
+  } else {
+    // pass
+  }
+
+  if (x >= 0 && y >= 0) {
     move(cells, x, y, teban);
   } else {
     // pass
@@ -622,7 +640,7 @@ workerthread.onmessage = function(e)
 
 function ___init()
 {
-    draw();
+  draw();
 }
 
 ___init();

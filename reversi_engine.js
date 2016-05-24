@@ -1,16 +1,21 @@
-//
-// this file should be beasutified!!
-//
-//
+/**
+ * @fileoverview reversi engine with webworker.
+ */
 
-function Sleep(Tmsec) {
-  var d1 = new Date().getTime();
-  var d2 = new Date().getTime();
-  while (d2 < d1+Tmsec) {  // wait T msec.
-    d2 = new Date().getTime();
-  }
-  return;
-}
+/*
+ * ex.
+ *  ww = new Worker('reversi_engine.js');
+ *  ww.onmessage = function(e) {
+ *    let hinto = e.data.hinto;
+ *    let kyokumensu = e.data.kyokumensu;
+ *    let duration = e.data.duration;
+ *
+ *    // some processing
+ *  }
+ *  function yourfunc() {
+ *    ww.postMessage({cells:cells, teban:teban, depth:3});
+ *  }
+ */
 
 // const SENTE = 1;
 // const GOTE = -1;
@@ -27,14 +32,14 @@ function count(c)
 }
 
 var evaltbl = [
-  10,-5,5,3,3,5,-5,10,
-  -5,-5,1,1,1,1,-5,-5,
-  5,1,1,1,1,1,1,5,
-  3,1,1,0,0,1,1,3,
-  3,1,1,0,0,1,1,3,
-  5,1,1,1,1,1,1,5,
-  -5,-5,1,1,1,1,-5,-5,
-  10,-5,5,3,3,5,-5,10];
+  10, -5, 5, 3, 3, 5, -5, 10,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  5,   1, 1, 1, 1, 1,  1,  5,
+  3,   1, 1, 0, 0, 1,  1,  3,
+  3,   1, 1, 0, 0, 1,  1,  3,
+  5,   1, 1, 1, 1, 1,  1,  5,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  10, -5, 5, 3, 3, 5, -5, 10];
 
 function evaluate(c)
 {
@@ -52,7 +57,7 @@ function reverse(c, xc, yc)
   let val;
 
   // ç∂
-  for (i = xc ; i !== 0 ;){
+  for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
     if (val == color) {
@@ -70,7 +75,7 @@ function reverse(c, xc, yc)
 
   // âE
   j = -1;
-  for (i = xc+1 ; i < NUMCELL ; ++i){
+  for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
     if (val == color) {
       j = i;
@@ -87,7 +92,7 @@ function reverse(c, xc, yc)
 
   // è„
   j = -1;
-  for (i = yc ; i !== 0 ;){
+  for (i = yc ; i !== 0 ;) {
     --i;
     val = c[xc+NUMCELL*i];
     if (val == color) {
@@ -105,10 +110,10 @@ function reverse(c, xc, yc)
 
   // â∫
   j = -1;
-  for (i = yc+1 ; i < NUMCELL ; ++i){
+  for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
     if (val == color) {
-      j = i;
+      j = i;// this cam a
       break;
     } else if (val == BLANK) {
       break;
@@ -122,7 +127,7 @@ function reverse(c, xc, yc)
 
   // ç∂è„
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc-i < 0) {
       break;
     }
@@ -142,7 +147,7 @@ function reverse(c, xc, yc)
 
   // âEè„
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc-i < 0) {
       break;
     }
@@ -162,7 +167,7 @@ function reverse(c, xc, yc)
 
   // âEâ∫
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
       break;
     }
@@ -181,7 +186,7 @@ function reverse(c, xc, yc)
   }
 
   j = -1;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc+i >= NUMCELL) {
       break;
     }
@@ -211,7 +216,7 @@ function genmove(c, tbn)
       x = i%NUMCELL;
       y = (i-x)/NUMCELL;
       if (checkreverse(c, x, y, tbn)) {
-          te.push({x: x, y: y, hyoka: 9999, child:null});
+        te.push({x: x, y: y, hyoka: 9999, child:null});
       }
     }
   }
@@ -445,7 +450,7 @@ function checkreverse(c, xc, yc, color)
   // Å©Å´
   j = false;
   rev = false;
-  for (i = 1 ; i < NUMCELL ; ++i){
+  for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc+i >= NUMCELL) {
       break;
     }
