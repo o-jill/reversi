@@ -525,6 +525,14 @@ function checkreverse(c, xc, yc, color)
   return false;
 }
 
+/**
+ * generate possible moves.
+ *
+ * @param  {[Array]}   c   board situation
+ * @param  {[Integer]} tbn SENTE or GOTE
+ *
+ * @return {[Array]}   Array of this --> {x: x, y: y, hyoka: 9999, child:null}
+ */
 function genmove(c, tbn)
 {
   let te = [];
@@ -605,6 +613,19 @@ function AutoCOMMove()
 {
   autocommove = 1-autocommove;
   inp.text = "" + autocommove;
+}
+
+function hint()
+{
+  let te = genmove(cells, teban);
+  let sz = te.length;
+  let txt = "";
+  for (let i = 0 ; i < sz ; ++i) {
+    let x = te[i].x;
+    let y = te[i].y;
+    txt += "(" + x + "," + y + "),";
+  }
+  inp.value = txt;
 }
 
 workerthread.onmessage = function(e)
