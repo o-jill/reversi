@@ -550,6 +550,9 @@ function checkResign()
 
 function COMmove()
 {
+  if (enableclick == false)
+    return;
+
   enableclick = false;
   prgs.style.display = 'none';
   prgsm.style.display = 'block';
@@ -561,6 +564,9 @@ function COMmove()
 
 function COMmoveR()
 {
+  if (enableclick == false)
+    return;
+
   enableclick = false;
   prgs.style.display = 'none';
   prgsm.style.display = 'block';
@@ -572,6 +578,9 @@ function COMmoveR()
 
 function init()
 {
+  if (enableclick == false)
+    return;
+
   cells = [
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
