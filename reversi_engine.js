@@ -263,11 +263,70 @@ function genandeval(node, c, teban, depth)
   return node;
 }
 
+function shuffle(arr) {
+  let i, j, temp;
+  arr = arr.slice();
+  i = arr.length;
+  if (i === 0) {
+    return arr;
+  }
+  while (--i) {
+    j = Math.floor(Math.random() * (i + 1));
+    temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+  return arr;
+}
+
+/** 読みと指手の生成 */
+function genandeval_shuffle(node, c, teban, depth)
+{
+  if (depth == 0) {
+    node.kyokumensu = 1;
+    return evaluate(c);
+  }
+
+  let child = genmove(c, teban);
+  if (child.length == 0) {  // 指し手無し ≒ パス
+    node.child = child;
+    node.kyokumensu = 1;
+    let val = count(c)*100;
+    return val;
+  } else {
+    // shuffle
+    node.child = shuffle(child);
+  }
+
+  let celltmp = new Array(NUMCELL*NUMCELL);
+  let sum  = 0;
+  for (let i = 0 ; i < node.child.length ; ++i) {
+    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
+      celltmp[j] = c[j];
+    }
+    let x = child[i].x;
+    let y = child[i].y;
+    move(celltmp, x, y, teban);
+
+    let val =  genandeval(child[i], c, -teban, depth-1);
+    child[i].hyoka = val;
+    if (node.best == null || node.best.hyoka*teban < val*teban) {
+      node.best = node.child[i];
+      node.hyoka = node.best.hyoka;
+    }
+    sum += child[i].kyokumensu;
+  }
+
+  node.kyokumensu = sum;
+
+  return node;
+}
+
 /** N手読み */
 function hintNr(cells, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
-  hinto = genandeval(hinto, cells, teban, n);
+  hinto = genandeval_shuffle(hinto, cells, teban, n);
 
   return [hinto.best, hinto.kyokumensu];
 }
