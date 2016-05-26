@@ -11,6 +11,7 @@ module.exports = {
         "comma-spacing": ["warn", { "before": false, "after": true }],
         "spaced-comment": "warn",
         "indent": ["error", 2],
-        "max-len": ["warn", 80]
+        "max-len": ["warn", 80],
+        "no-unused-vars": ["warn", {"vars": "local"}]
     }
 };
