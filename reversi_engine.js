@@ -251,11 +251,15 @@ function genandeval(node, c, teban, depth)
 
     let val =  genandeval(child[i], c, -teban, depth-1);
     child[i].hyoka = val;
+    sum += child[i].kyokumensu;
     if (node.best == null || node.best.hyoka*teban < val*teban) {
       node.best = node.child[i];
       node.hyoka = node.best.hyoka;
+    } else {
+      // ƒƒ‚ƒŠ‰ð•ú‚Ì‚Â‚à‚è
+      child[i] = null;
+      node.child[i] = null;
     }
-    sum += child[i].kyokumensu;
   }
 
   node.kyokumensu = sum;
@@ -310,11 +314,15 @@ function genandeval_shuffle(node, c, teban, depth)
 
     let val =  genandeval(child[i], c, -teban, depth-1);
     child[i].hyoka = val;
+    sum += child[i].kyokumensu;
     if (node.best == null || node.best.hyoka*teban < val*teban) {
       node.best = node.child[i];
       node.hyoka = node.best.hyoka;
+    } else {
+      // ƒƒ‚ƒŠ‰ð•ú‚Ì‚Â‚à‚è
+      child[i] = null;
+      node.child[i] = null;
     }
-    sum += child[i].kyokumensu;
   }
 
   node.kyokumensu = sum;

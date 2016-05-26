@@ -29,7 +29,9 @@ var cells = [
 
 var teban = SENTE;
 var autocommove = 0;
+var autocommatch = 0;
 var atcomchk = document.getElementById('acmchk');
+var atcommatchchk = document.getElementById('acmachk');
 var tesuu = 1;
 // var kifustr = "";
 
@@ -615,6 +617,12 @@ function AutoCOMMove()
   inp.text = "" + autocommove;
 }
 
+function AutoCOMMatch()
+{
+  autocommatch = 1-autocommatch;
+  inp.text = "" + autocommatch;
+}
+
 function hint()
 {
   let te = genmove(cells, teban);
@@ -666,6 +674,9 @@ workerthread.onmessage = function(e)
   enableclick = true;
   prgs.style.display = 'block';
   prgsm.style.display = 'none';
+
+  if (atcommatchchk.checked == true && teban != BLANK)
+    COMmoveR();
 }
 
 function ___init()
