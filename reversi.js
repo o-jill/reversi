@@ -609,7 +609,7 @@ function COMmoveR()
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:5});
+  workerthread.postMessage({cells:cells, teban:teban, depth:7});
 
   draw();
 }
