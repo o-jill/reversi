@@ -263,10 +263,10 @@ function move(c, x, y, t)
 function movestr(c, x, y, tb, ts, kms, tm)
 {
   let str = ts.toString(10) + "Žè–Ú ";
-  if (x <= 0 || y <= 0) {
+  if (x < 0 || y < 0) {
     // pass
   } else {
-    str + (x+1).toString(10) + (y+1).toString(10);
+    str += (x+1).toString(10) + (y+1).toString(10);
   }
 
   if (tb == SENTE) {
