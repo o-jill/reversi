@@ -34,6 +34,7 @@ var atcomchk = document.getElementById('acmchk');
 var atcommatchchk = document.getElementById('acmachk');
 var tesuu = 1;
 // var kifustr = "";
+var pass = 0;
 
 var enableclick = true;
 var workerthread = new Worker('reversi_engine.js');
@@ -260,21 +261,29 @@ function move(c, x, y, t)
   reverse(c, x, y);
 }
 
+function keiseibar(c)
+{
+  let cnt = count(c);
+  prgs.value = cnt+64;
+}
+
 function movestr(c, x, y, tb, ts, kms, tm)
 {
   let str = ts.toString(10) + "手目 ";
   if (x < 0 || y < 0) {
-    // pass
+    if (tb !== BLANK) {
+      str += "パス";
+    }
   } else {
     str += (x+1).toString(10) + (y+1).toString(10);
   }
 
   if (tb == SENTE) {
-    str += "黒 ";
+    str += " 黒 ";
   } else if (tb == GOTE) {
-    str += "白 ";
+    str += " 白 ";
   } else {
-    str += "終了";
+    str += " 終了";
   }
 
   let cnt = count(c);
@@ -295,6 +304,16 @@ function movestr(c, x, y, tb, ts, kms, tm)
   }
 
   str += "\n";
+
+  if (tb === BLANK) {
+    if (cnt > 0) {
+      str += "●の勝ち\n";
+    } else if (cnt < 0) {
+      str += "◯の勝ち\n";
+    } else {
+      str += "引き分け\n";
+    }
+  }
 
   return str;
 }
@@ -325,6 +344,7 @@ function onClick(e)
         kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0);
 
         ++tesuu;
+        pass = 0;
         // 手番変更
         if (teban == SENTE) {
           teban = GOTE;
@@ -339,16 +359,24 @@ function onClick(e)
         let te = genmove(cells, teban);
         if (te.length === 0) {
           // パス→手番変更
-          if (teban == SENTE) {
-            teban = GOTE;
-          } else if (teban == GOTE) {
-            teban = SENTE;
+          ++tesuu;
+          ++pass;
+          if (pass >= 2) {
+            teban = BLANK;
+          } else {
+            if (teban == SENTE) {
+              teban = GOTE;
+            } else if (teban == GOTE) {
+              teban = SENTE;
+            }
           }
+          kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0);
         }
       }
     }
 
     draw();
+    keiseibar(cells);
     // if (teban != BLANK && autocommmove !== 0)
     if (atcomchk.checked == true)
       COMmoveR();
@@ -564,7 +592,7 @@ function COMmove()
     return;
 
   enableclick = false;
-  prgs.style.display = 'none';
+  // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
   workerthread.postMessage({cells:cells, teban:teban, depth:3});
@@ -578,10 +606,10 @@ function COMmoveR()
     return;
 
   enableclick = false;
-  prgs.style.display = 'none';
+  // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:7});
+  workerthread.postMessage({cells:cells, teban:teban, depth:5});
 
   draw();
 }
@@ -605,6 +633,7 @@ function init()
 
   tesuu = 1;
   // kifustr = "";
+  pass = 0;
 
   kifu.value = "";
   inp.value = "";
@@ -652,31 +681,37 @@ workerthread.onmessage = function(e)
 
   if (x >= 0 && y >= 0) {
     move(cells, x, y, teban);
+    pass = 0;
   } else {
     // pass
+    ++pass;
   }
 
   kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
 
   ++tesuu;
   // 手番変更
-  if (teban == SENTE) {
-    teban = GOTE;
-  } else if (teban == GOTE) {
-    if (tesuu >= NUMCELL*NUMCELL-4) {
-      teban = BLANK;
-    } else {
+  if (pass >= 2) {
+    teban = BLANK;
+  } else {
+    if (teban == SENTE) {
+      teban = GOTE;
+    } else if (teban == GOTE) {
       teban = SENTE;
     }
   }
   draw();
+  keiseibar(cells);
 
   enableclick = true;
-  prgs.style.display = 'block';
+  // prgs.style.display = 'block';
   prgsm.style.display = 'none';
 
-  if (atcommatchchk.checked == true && teban != BLANK)
+  if (atcommatchchk.checked == true && teban != BLANK) {
     COMmoveR();
+  } else {
+    kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+  }
 }
 
 function ___init()

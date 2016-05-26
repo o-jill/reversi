@@ -3,6 +3,18 @@
 <head>
     <title>reversi</title>
     <meta charset="shift_jis">
+    <style>
+        progress {
+            padding: 20px;
+            width: 400px;
+        }
+        progress.domi {
+            color: black;
+        }
+        progress::-moz-progress-bar { background: black; }
+        progress::-webkit-progress-value { background: black; }
+        progress::-webkit-progress-bar { background: white; }
+    </style>
 </head>
 <body>
 <div>
@@ -10,8 +22,9 @@
 </div>
 <input id='eval' value='----'><button onclick="hint()">hint</button>&nbsp;<button onclick="COMmove()">COM move</button>&nbsp;<button onclick="COMmoveR()">COM moveR</button><BR>
 <label onclick="AutoCOMMove()"><input type="checkbox" id='acmchk'>AutoComMove</label>
-<label onclick="AutoCOMMatch()"><input type="checkbox" id='acmachk'>AutoCOMMatch</label>
-<progress id='prgs' max=100 value=20>progress bar</progress><progress id='prgs2' max=100>processing</progress><BR>
+<label onclick="AutoCOMMatch()"><input type="checkbox" id='acmachk'>AutoCOMMatch</label><BR>
+<progress id='prgs' class='domi' max=128 value=64>progress bar</progress><BR>
+<progress id='prgs2' max=400>processing</progress><BR>
 <textarea id='kifu'></textarea><BR>
 <textarea id='hintt'>---</textarea><BR>
 <button onclick="init()">init</button>
