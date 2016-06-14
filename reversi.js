@@ -323,6 +323,7 @@ function onClick(e)
   if (!e) e = window.event; // レガシー
   if (enableclick == false)
     return;
+  let bnextmove = false;
   let rect = e.target.getBoundingClientRect();
   let mousex = e.clientX-rect.left;
   let mousey = e.clientY-rect.top;
@@ -345,6 +346,8 @@ function onClick(e)
 
         ++tesuu;
         pass = 0;
+        bnextmove = true;
+
         // 手番変更
         if (teban == SENTE) {
           teban = GOTE;
@@ -361,6 +364,7 @@ function onClick(e)
           // パス→手番変更
           ++tesuu;
           ++pass;
+          bnextmove = true;
           if (pass >= 2) {
             teban = BLANK;
           } else {
@@ -375,10 +379,13 @@ function onClick(e)
       }
     }
 
+    if (bnextmove && teban == BLANK) {
+      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+    }
     draw();
     keiseibar(cells);
     // if (teban != BLANK && autocommmove !== 0)
-    if (atcomchk.checked == true)
+    if (bnextmove && atcomchk.checked == true)
       COMmoveR();
   }
   // inp.value = evaluate(cells).toString(10) + "," + strteban();
@@ -710,7 +717,9 @@ workerthread.onmessage = function(e)
   if (atcommatchchk.checked == true && teban != BLANK) {
     COMmoveR();
   } else {
-    kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+    if (teban == BLANK) {
+      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+    }
   }
 }
 

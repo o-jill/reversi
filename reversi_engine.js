@@ -228,6 +228,7 @@ function genandeval(node, c, teban, depth)
 {
   if (depth == 0) {
     node.kyokumensu = 1;
+    node.child = null;
     return evaluate(c);
   }
 
@@ -250,7 +251,12 @@ function genandeval(node, c, teban, depth)
     move(celltmp, x, y, teban);
 
     let val =  genandeval(child[i], c, -teban, depth-1);
-    child[i].hyoka = val;
+    if (val.hyoka == null) {
+      child[i].hyoka = val;
+    } else {
+      child[i].hyoka = val.hyoka;
+      val = val.hyoka;
+    }
     sum += child[i].kyokumensu;
     if (node.best == null || node.best.hyoka*teban < val*teban) {
       node.best = node.child[i];
@@ -288,6 +294,7 @@ function genandeval_shuffle(node, c, teban, depth)
 {
   if (depth == 0) {
     node.kyokumensu = 1;
+    node.child = null;
     return evaluate(c);
   }
 
@@ -313,7 +320,12 @@ function genandeval_shuffle(node, c, teban, depth)
     move(celltmp, x, y, teban);
 
     let val =  genandeval(child[i], c, -teban, depth-1);
-    child[i].hyoka = val;
+    if (val.hyoka == null) {
+      child[i].hyoka = val;
+    } else {
+      child[i].hyoka = val.hyoka;
+      val = val.hyoka;
+    }
     sum += child[i].kyokumensu;
     if (node.best == null || node.best.hyoka*teban < val*teban) {
       node.best = node.child[i];
