@@ -729,3 +729,9 @@ function ___init()
 }
 
 ___init();
+
+function copykifu()
+{
+  kifu.select();
+  document.execCommand('copy');
+}
