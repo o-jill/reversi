@@ -56,7 +56,7 @@ function reverse(c, xc, yc)
   let color = c[xc+yc*NUMCELL];
   let val;
 
-  // ¶
+  // å·¦
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
@@ -73,7 +73,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰E
+  // å³
   j = -1;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
@@ -90,7 +90,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ã
+  // ä¸Š
   j = -1;
   for (i = yc ; i !== 0 ;) {
     --i;
@@ -108,7 +108,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰º
+  // ä¸‹
   j = -1;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
@@ -125,7 +125,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ¶ã
+  // å·¦ä¸Š
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc-i < 0) {
@@ -145,7 +145,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰Eã
+  // å³ä¸Š
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc-i < 0) {
@@ -165,7 +165,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰E‰º
+  // å³ä¸‹
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
@@ -223,7 +223,7 @@ function genmove(c, tbn)
   return te;
 }
 
-/** “Ç‚İ‚Æwè‚Ì¶¬ */
+/** èª­ã¿ã¨æŒ‡æ‰‹ã®ç”Ÿæˆ */
 function genandeval(node, c, teban, depth)
 {
   if (depth == 0) {
@@ -234,7 +234,7 @@ function genandeval(node, c, teban, depth)
 
   let child = genmove(c, teban);
   node.child = child;
-  if (child.length == 0) {  // w‚µè–³‚µ à ƒpƒX
+  if (child.length == 0) {  // æŒ‡ã—æ‰‹ç„¡ã— â‰’ ãƒ‘ã‚¹
     node.kyokumensu = 1;
     let val = count(c)*100;
     return val;
@@ -262,7 +262,7 @@ function genandeval(node, c, teban, depth)
       node.best = node.child[i];
       node.hyoka = node.best.hyoka;
     } else {
-      // ƒƒ‚ƒŠ‰ğ•ú‚Ì‚Â‚à‚è
+      // ãƒ¡ãƒ¢ãƒªè§£æ”¾ã®ã¤ã‚‚ã‚Š
       child[i] = null;
       node.child[i] = null;
     }
@@ -289,7 +289,7 @@ function shuffle(arr) {
   return arr;
 }
 
-/** “Ç‚İ‚Æwè‚Ì¶¬ */
+/** èª­ã¿ã¨æŒ‡æ‰‹ã®ç”Ÿæˆ */
 function genandeval_shuffle(node, c, teban, depth)
 {
   if (depth == 0) {
@@ -299,7 +299,7 @@ function genandeval_shuffle(node, c, teban, depth)
   }
 
   let child = genmove(c, teban);
-  if (child.length == 0) {  // w‚µè–³‚µ à ƒpƒX
+  if (child.length == 0) {  // æŒ‡ã—æ‰‹ç„¡ã— â‰’ ãƒ‘ã‚¹
     node.child = child;
     node.kyokumensu = 1;
     let val = count(c)*100;
@@ -331,7 +331,7 @@ function genandeval_shuffle(node, c, teban, depth)
       node.best = node.child[i];
       node.hyoka = node.best.hyoka;
     } else {
-      // ƒƒ‚ƒŠ‰ğ•ú‚Ì‚Â‚à‚è
+      // ãƒ¡ãƒ¢ãƒªè§£æ”¾ã®ã¤ã‚‚ã‚Š
       child[i] = null;
       node.child[i] = null;
     }
@@ -342,7 +342,7 @@ function genandeval_shuffle(node, c, teban, depth)
   return node;
 }
 
-/** Nè“Ç‚İ */
+/** Næ‰‹èª­ã¿ */
 function hintNr(cells, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
@@ -380,10 +380,10 @@ function move(c, x, y, t)
 // var celltmp = new Array(NUMCELL*NUMCELL);
 
 /**
- * @param c ”Õ‚Ìî•ñ
- * @param xc ƒ`ƒFƒbƒN‚·‚éÀ•W
- * @param yc ƒ`ƒFƒbƒN‚·‚éÀ•W
- * @param color Î‚ÌF
+ * @param c ç›¤ã®æƒ…å ±
+ * @param xc ãƒã‚§ãƒƒã‚¯ã™ã‚‹åº§æ¨™
+ * @param yc ãƒã‚§ãƒƒã‚¯ã™ã‚‹åº§æ¨™
+ * @param color çŸ³ã®è‰²
  */
 function checkreverse(c, xc, yc, color)
 {
@@ -391,7 +391,7 @@ function checkreverse(c, xc, yc, color)
   let rev = false;
   let val;
 
-  // ©
+  // â†
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
@@ -408,7 +408,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨
+  // â†’
   j = false;
   rev = false;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
@@ -426,7 +426,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ª
+  // â†‘
   j = false;
   rev = false;
   for (i = yc ; i !== 0 ;) {
@@ -445,7 +445,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // «
+  // â†“
   j = false;
   rev = false;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
@@ -463,7 +463,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ©ª
+  // â†â†‘
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -484,7 +484,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨ª
+  // â†’â†‘
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -505,7 +505,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨«
+  // â†’â†“
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -526,7 +526,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ©«
+  // â†â†“
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {

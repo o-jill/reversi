@@ -16,7 +16,7 @@ const BLANK = 0;
 const NUMCELL = 8;
 
 
-/* 1:•,0:‚È‚µ,-1:”’*/
+/* 1:é»’,0:ãªã—,-1:ç™½*/
 var cells = [
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,
@@ -94,7 +94,7 @@ function reverse(c, xc, yc)
   let color = c[xc+yc*NUMCELL];
   let val;
 
-  // ¶
+  // å·¦
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
@@ -111,7 +111,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰E
+  // å³
   j = -1;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
@@ -128,7 +128,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ã
+  // ä¸Š
   j = -1;
   for (i = yc ; i !== 0 ;) {
     --i;
@@ -146,7 +146,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰º
+  // ä¸‹
   j = -1;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
@@ -163,7 +163,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ¶ã
+  // å·¦ä¸Š
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc-i < 0 || yc-i < 0) {
@@ -183,7 +183,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰Eã
+  // å³ä¸Š
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc-i < 0) {
@@ -203,7 +203,7 @@ function reverse(c, xc, yc)
     }
   }
 
-  // ‰E‰º
+  // å³ä¸‹
   j = -1;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
@@ -269,21 +269,21 @@ function keiseibar(c)
 
 function movestr(c, x, y, tb, ts, kms, tm)
 {
-  let str = ts.toString(10) + "è–Ú ";
+  let str = ts.toString(10) + "æ‰‹ç›® ";
   if (x < 0 || y < 0) {
     if (tb !== BLANK) {
-      str += "ƒpƒX";
+      str += "ãƒ‘ã‚¹";
     }
   } else {
     str += (x+1).toString(10) + (y+1).toString(10);
   }
 
   if (tb == SENTE) {
-    str += " • ";
+    str += " é»’ ";
   } else if (tb == GOTE) {
-    str += " ”’ ";
+    str += " ç™½ ";
   } else {
-    str += " I—¹";
+    str += " çµ‚äº†";
   }
 
   let cnt = count(c);
@@ -292,10 +292,10 @@ function movestr(c, x, y, tb, ts, kms, tm)
   if (tb !== BLANK) {
     str += " ";
     if (kms != null && kms > 0)
-      // str += kms.toString(10) + "‹Ç–Ê";
-      str += kms.toLocaleString() + "‹Ç–Ê";
+      // str += kms.toString(10) + "å±€é¢";
+      str += kms.toLocaleString() + "å±€é¢";
     else
-      str += "1‰­3è";
+      str += "1å„„3æ‰‹";
   }
 
   if (tm != null && tm >= 0) {
@@ -307,11 +307,11 @@ function movestr(c, x, y, tb, ts, kms, tm)
 
   if (tb === BLANK) {
     if (cnt > 0) {
-      str += "œ‚ÌŸ‚¿\n";
+      str += "â—ã®å‹ã¡\n";
     } else if (cnt < 0) {
-      str += "ü‚ÌŸ‚¿\n";
+      str += "â—¯ã®å‹ã¡\n";
     } else {
-      str += "ˆø‚«•ª‚¯\n";
+      str += "å¼•ãåˆ†ã‘\n";
     }
   }
 
@@ -320,7 +320,7 @@ function movestr(c, x, y, tb, ts, kms, tm)
 
 function onClick(e)
 {
-  if (!e) e = window.event; // ƒŒƒKƒV[
+  if (!e) e = window.event; // ãƒ¬ã‚¬ã‚·ãƒ¼
   if (enableclick == false)
     return;
   let bnextmove = false;
@@ -348,7 +348,7 @@ function onClick(e)
         pass = 0;
         bnextmove = true;
 
-        // è”Ô•ÏX
+        // æ‰‹ç•ªå¤‰æ›´
         if (teban == SENTE) {
           teban = GOTE;
         } else if (teban == GOTE) {
@@ -361,7 +361,7 @@ function onClick(e)
       } else {
         let te = genmove(cells, teban);
         if (te.length === 0) {
-          // ƒpƒX¨è”Ô•ÏX
+          // ãƒ‘ã‚¹â†’æ‰‹ç•ªå¤‰æ›´
           ++tesuu;
           ++pass;
           bnextmove = true;
@@ -393,10 +393,10 @@ function onClick(e)
 
 
 /**
- * @param c ”Õ‚Ìî•ñ
- * @param xc ƒ`ƒFƒbƒN‚·‚éÀ•W
- * @param yc ƒ`ƒFƒbƒN‚·‚éÀ•W
- * @param color Î‚ÌF
+ * @param c ç›¤ã®æƒ…å ±
+ * @param xc ãƒã‚§ãƒƒã‚¯ã™ã‚‹åº§æ¨™
+ * @param yc ãƒã‚§ãƒƒã‚¯ã™ã‚‹åº§æ¨™
+ * @param color çŸ³ã®è‰²
  */
 function checkreverse(c, xc, yc, color)
 {
@@ -404,7 +404,7 @@ function checkreverse(c, xc, yc, color)
   let rev = false;
   let val;
 
-  // ©
+  // â†
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
@@ -421,7 +421,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨
+  // â†’
   j = false;
   rev = false;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
@@ -439,7 +439,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ª
+  // â†‘
   j = false;
   rev = false;
   for (i = yc ; i !== 0 ;) {
@@ -458,7 +458,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // «
+  // â†“
   j = false;
   rev = false;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
@@ -476,7 +476,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ©ª
+  // â†â†‘
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -497,7 +497,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨ª
+  // â†’â†‘
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -518,7 +518,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ¨«
+  // â†’â†“
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -539,7 +539,7 @@ function checkreverse(c, xc, yc, color)
     return true;
   }
 
-  // ©«
+  // â†â†“
   j = false;
   rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
@@ -590,7 +590,7 @@ function genmove(c, tbn)
 
 function checkResign()
 {
-    // ‚æ‚­‚í‚©‚ç‚ñ‚Ì‚Å‰„Šú
+    // ã‚ˆãã‚ã‹ã‚‰ã‚“ã®ã§å»¶æœŸ
 }
 
 function COMmove()
@@ -697,7 +697,7 @@ workerthread.onmessage = function(e)
   kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
 
   ++tesuu;
-  // è”Ô•ÏX
+  // æ‰‹ç•ªå¤‰æ›´
   if (pass >= 2) {
     teban = BLANK;
   } else {
