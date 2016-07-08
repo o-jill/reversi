@@ -55,6 +55,12 @@ function fixedstones(c)
         break;
     }
     sum += i;
+    // right down
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[i*NUMCELL+i] != cnr)
+        break;
+    }
+    sum += i;
     total += cnr * sum;
   }
   if (c[NUMCELL-1] != BLANK) {
@@ -68,6 +74,12 @@ function fixedstones(c)
     // down
     for (i = 1 ; i < NUMCELL-1 ; ++i) {
       if (c[i*NUMCELL + NUMCELL-1] != cnr)
+        break;
+    }
+    sum += i;
+    // left  down
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[i*NUMCELL + NUMCELL-1-i] != cnr)
         break;
     }
     sum += i;
@@ -87,6 +99,12 @@ function fixedstones(c)
         break;
     }
     sum += i-1;
+    // right  up
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[(NUMCELL-1-i)*NUMCELL + i] != cnr)
+        break;
+    }
+    sum += i;
     total += cnr * sum;
   }
   if (c[NUMCELL*NUMCELL-1] != BLANK) {
@@ -100,6 +118,12 @@ function fixedstones(c)
     // up
     for (i = 1 ; i < NUMCELL-1 ; ++i) {
       if (c[(NUMCELL-i)*NUMCELL-1] != cnr)
+        break;
+    }
+    sum += i;
+    // left  up
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[(NUMCELL-i)*NUMCELL-1-i] != cnr)
         break;
     }
     sum += i;
