@@ -31,6 +31,84 @@ function count(c)
   return sum;
 }
 
+/**
+ * コレ以上ひっくり返されない石の数を数える。
+ * @param  Array c 盤の情報
+ * @return Integer   石の数の差(黒＋、白－)
+ */
+function fixedstones(c)
+{
+  let i;
+  let sum = 0;
+  let total = 0;
+  if (c[0] != BLANK) {
+    let cnr = c[0];
+    // right
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[i] != cnr)
+        break;
+    }
+    sum = i;
+    // down
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[i*NUMCELL] != cnr)
+        break;
+    }
+    sum += i;
+    total += cnr * sum;
+  }
+  if (c[NUMCELL-1] != BLANK) {
+    let cnr = c[NUMCELL-1];
+    // left
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[NUMCELL-1-i] != cnr)
+        break;
+    }
+    sum = i;
+    // down
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[i*NUMCELL + NUMCELL-1] != cnr)
+        break;
+    }
+    sum += i;
+    total += cnr * sum;
+  }
+  if (c[NUMCELL*NUMCELL-NUMCELL] != BLANK) {
+    let cnr = c[NUMCELL*NUMCELL-NUMCELL];
+    // right
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[NUMCELL*NUMCELL-NUMCELL+i] != cnr)
+        break;
+    }
+    sum = i;
+    // up
+    for (i = 2 ; i < NUMCELL ; ++i) {
+      if (c[NUMCELL*(NUMCELL-i)] != cnr)  // c[NUMCELL*(NUMCELL-1-i)]
+        break;
+    }
+    sum += i-1;
+    total += cnr * sum;
+  }
+  if (c[NUMCELL*NUMCELL-1] != BLANK) {
+    let cnr = c[NUMCELL*NUMCELL-1];
+    // left
+    for (i = 2 ; i < NUMCELL ; ++i) {
+      if (c[NUMCELL*NUMCELL-i] != cnr)  // c[NUMCELL*NUMCELL-1-i]
+        break;
+    }
+    sum = i-1;
+    // up
+    for (i = 1 ; i < NUMCELL-1 ; ++i) {
+      if (c[(NUMCELL-i)*NUMCELL-1] != cnr)
+        break;
+    }
+    sum += i;
+    total += cnr * sum;
+  }
+
+  return sum;
+}
+
 var evaltbl = [
   20, -5, 5, 3, 3, 5, -5, 20,
   -5, -5, 1, 1, 1, 1, -5, -5,
@@ -47,6 +125,7 @@ function evaluate(c)
   for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
     sum += evaltbl[i]*c[i];
   }
+  sum += fixedstones(c) * 10;
   return sum;
 }
 
@@ -236,7 +315,7 @@ function genandeval(node, c, teban, depth)
   node.child = child;
   if (child.length == 0) {  // 指し手無し ≒ パス
     node.kyokumensu = 1;
-    let val = count(c)*100;
+    let val = count(c)*200;
     return val;
   }
 
@@ -292,11 +371,11 @@ function shuffle(arr) {
 /** 読みと指手の生成 */
 function genandeval_shuffle(node, c, teban, depth)
 {
-  if (depth == 0) {
+  /* if (depth == 0) {
     node.kyokumensu = 1;
     node.child = null;
     return evaluate(c);
-  }
+  }*/
 
   let child = genmove(c, teban);
   if (child.length == 0) {  // 指し手無し ≒ パス
