@@ -721,6 +721,21 @@ workerthread.onmessage = function(e)
       kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
     }
   }
+  if (hinto != null) {
+    let str = "";
+    let temban = -teban;
+    for (let node = hinto ; node != null ; node = node.best) {
+      if (temban == SENTE)
+        str += "●(";
+      else if (temban == GOTE)
+        str += "◯(";
+
+      str += node.x.toString(10) + "," + node.y.toString(10) + ") ";
+      temban = -temban;
+    }
+
+    hintt.value = str;
+  }
 }
 
 function ___init()
