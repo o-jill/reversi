@@ -19,19 +19,19 @@
 <body>
 <table border=0>
 <tr><td>
-    <canvas id='mycanvas' width='410' height='410' onclick="onClick()"></canvas>
+    <canvas id='mycanvas' width='410' height='410' onclick="onClick()"></canvas><BR>
+    <progress id='prgs' class='domi' max=128 value=64>progress bar</progress><BR>
+    <input id='eval' value='----'><button onclick="hint()">hint</button>&nbsp;<button onclick="COMmove()">COM move</button>&nbsp;<button onclick="COMmoveR()">COM moveR</button><BR>
+    <label onclick="AutoCOMMove()"><input type="checkbox" id='acmchk'>AutoComMove</label>
+    <label onclick="AutoCOMMatch()"><input type="checkbox" id='acmachk'>AutoCOMMatch</label><BR>
 </td><td>
+    <textarea id='kifu' cols=40 rows=25></textarea>
     <button onclick="copykifu()">copy kifu</button><BR>
-    <textarea id='kifu' cols=40 rows=25></textarea><BR>
     <progress id='prgs2' max=400>processing</progress><BR>
     <textarea id='hintt' cols=60>---</textarea><BR>
     <button onclick="init()">init</button>
 </td></tr>
 </table>
-<input id='eval' value='----'><button onclick="hint()">hint</button>&nbsp;<button onclick="COMmove()">COM move</button>&nbsp;<button onclick="COMmoveR()">COM moveR</button><BR>
-<label onclick="AutoCOMMove()"><input type="checkbox" id='acmchk'>AutoComMove</label>
-<label onclick="AutoCOMMatch()"><input type="checkbox" id='acmachk'>AutoCOMMatch</label><BR>
-<progress id='prgs' class='domi' max=128 value=64>progress bar</progress><BR>
 
 <script type="text/javascript" src="reversi.js"></script>
 </body></html>
