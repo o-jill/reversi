@@ -241,6 +241,7 @@ function reverse(c, xc, yc)
       c[(xc-i)+NUMCELL*(yc+i)] = color;
     }
   }
+  return c;
 }
 
 
@@ -258,7 +259,7 @@ function strteban()
 function move(c, x, y, t)
 {
   c[x+y*NUMCELL] = t;
-  reverse(c, x, y);
+  return reverse(c, x, y);
 }
 
 function keiseibar(c)
@@ -340,7 +341,7 @@ function onClick(e)
     // inp.value = cellx.toString(10) + "," + celly.toString(10);
     if (cells[cellx+celly*NUMCELL] == BLANK) {
       if (checkreverse(cells, cellx, celly, teban)) {
-        move(cells, cellx, celly, teban);
+        cells = move(cells, cellx, celly, teban);
 
         kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0);
 

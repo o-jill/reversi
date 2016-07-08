@@ -306,6 +306,8 @@ function reverse(c, xc, yc)
       c[(xc-i)+NUMCELL*(yc+i)] = color;
     }
   }
+
+  return c;
 }
 
 function genmove(c, tbn)
@@ -351,9 +353,9 @@ function genandeval(node, c, teban, depth)
     }
     let x = child[i].x;
     let y = child[i].y;
-    move(celltmp, x, y, teban);
+    celltmp = move(celltmp, x, y, teban);
 
-    let val =  genandeval(child[i], c, -teban, depth-1);
+    let val =  genandeval(child[i], celltmp, -teban, depth-1);
     if (val.hyoka == null) {
       child[i].hyoka = val;
     } else {
@@ -411,7 +413,7 @@ function genandeval_shuffle(node, c, teban, depth)
     // shuffle
     node.child = shuffle(child);
   }
-
+  // let points = new Array(node.child.length);
   let celltmp = new Array(NUMCELL*NUMCELL);
   let sum  = 0;
   for (let i = 0 ; i < node.child.length ; ++i) {
@@ -420,9 +422,9 @@ function genandeval_shuffle(node, c, teban, depth)
     }
     let x = child[i].x;
     let y = child[i].y;
-    move(celltmp, x, y, teban);
+    celltmp = move(celltmp, x, y, teban);
 
-    let val =  genandeval(child[i], c, -teban, depth-1);
+    let val =  genandeval(child[i], celltmp, -teban, depth-1);
     if (val.hyoka == null) {
       child[i].hyoka = val;
     } else {
@@ -438,6 +440,7 @@ function genandeval_shuffle(node, c, teban, depth)
       child[i] = null;
       node.child[i] = null;
     }
+    // points[i] = val;
   }
 
   node.kyokumensu = sum;
@@ -446,10 +449,10 @@ function genandeval_shuffle(node, c, teban, depth)
 }
 
 /** N手読み */
-function hintNr(cells, teban, n)
+function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: 9999, child:null, kyokumensu:0};
-  hinto = genandeval_shuffle(hinto, cells, teban, n);
+  hinto = genandeval_shuffle(hinto, c, teban, n);
 
   return [hinto.best, hinto.kyokumensu];
 }
@@ -477,7 +480,7 @@ onmessage = function (e) {
 function move(c, x, y, t)
 {
   c[x+y*NUMCELL] = t;
-  reverse(c, x, y);
+  return reverse(c, x, y);
 }
 
 // var celltmp = new Array(NUMCELL*NUMCELL);
