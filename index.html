@@ -26,7 +26,7 @@
     <label onclick="AutoCOMMatch()"><input type="checkbox" id='acmachk'>AutoCOMMatch</label><BR>
 </td><td>
     <textarea id='kifu' cols=40 rows=25></textarea>
-    <button onclick="copykifu()">copy kifu</button><BR>
+    <button onclick="copykifu()">copy kifu</button><a id="download" href="#" download="kifu.txt" onclick="fsave()">save</a><BR>
     <progress id='prgs2' max=400>processing</progress><BR>
     <textarea id='hintt' cols=60>---</textarea><BR>
     <button onclick="init()">init</button>

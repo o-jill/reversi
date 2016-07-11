@@ -739,6 +739,24 @@ workerthread.onmessage = function(e)
   }
 }
 
+/**
+ * 棋譜をファイルに保存。
+ * @return {[type]} [description]
+ */
+function fsave()
+{
+  let content = kifu.value;
+  let blob = new Blob([content], {"type" : "text/plain"});
+  if (window.navigator.msSaveBlob) {
+    window.navigator.msSaveBlob(blob, "kifu.txt");
+
+    // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+    window.navigator.msSaveOrOpenBlob(blob, "kifu.txt");
+  } else {
+    document.getElementById("download").href = window.URL.createObjectURL(blob);
+  }
+}
+
 function ___init()
 {
   draw();
