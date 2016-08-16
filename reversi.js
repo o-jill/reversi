@@ -15,7 +15,6 @@ const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
 
-
 /* 1:黒,0:なし,-1:白*/
 var cells = [
   0, 0, 0, 0, 0, 0, 0, 0,
@@ -319,6 +318,12 @@ function movestr(c, x, y, tb, ts, kms, tm)
   return str;
 }
 
+function gotobottom(k)
+{
+  k.scrollTop = k.scrollHeight;
+}
+
+
 function onClick(e)
 {
   if (!e) e = window.event; // レガシー
@@ -383,6 +388,7 @@ function onClick(e)
     if (bnextmove && teban == BLANK) {
       kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
     }
+    gotobottom(kifu);
     draw();
     keiseibar(cells);
     // if (teban != BLANK && autocommmove !== 0)
@@ -737,6 +743,7 @@ workerthread.onmessage = function(e)
 
     hintt.value = str;
   }
+  gotobottom(kifu);
 }
 
 /**
