@@ -130,7 +130,7 @@ function fixedstones(c)
     total += cnr * sum;
   }
 
-  return sum;
+  return total;
 }
 
 var evaltbl = [
