@@ -369,7 +369,7 @@ function genandeval(node, c, teban, depth)
     sum += child[i].kyokumensu;
 // console.log("c%d:%d,%d:%d:%d",depth,x,y,teban,val);
 // console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
-             node.hyoka*teban, val, teban, val*teban, depth);
+//             node.hyoka*teban, val, teban, val*teban, depth);
 // console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
       node.best = node.child[i];
@@ -442,7 +442,7 @@ function genandeval_shuffle(node, c, teban, depth)
     }
     sum += child[i].kyokumensu;
 //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
-              node.hyoka*teban, val, teban, val*teban, depth);
+//              node.hyoka*teban, val, teban, val*teban, depth);
 //  console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
       node.best = node.child[i];
