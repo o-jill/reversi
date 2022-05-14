@@ -346,7 +346,7 @@ function genandeval(node, c, teban, depth)
     let val = count(c)*200;
 //  console.log("pass @d%d ban:%d val:%d",depth,teban,val);
     node.hyoka = val;
-    return val;
+    return node;
   }
 
   let celltmp = new Array(NUMCELL*NUMCELL);
