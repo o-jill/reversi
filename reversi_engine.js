@@ -150,6 +150,7 @@ function evaluate(c)
     sum += evaltbl[i]*c[i];
   }
   sum += fixedstones(c) * 10;
+  console.info("leaf:%d", sum);
   return sum;
 }
 
@@ -471,7 +472,7 @@ function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0};
   hinto = genandeval_shuffle(hinto, c, teban, n);
-
+console.log("best:%d, %d nodes.", hinto.hyoka, hinto.kyokumensu)
   return [hinto.best, hinto.kyokumensu];
 }
 
