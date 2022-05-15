@@ -3,11 +3,11 @@
 # for testing on a browser.
 
 # usage:
-#    ruby travisci/browsertest.rb <options>
+#    ruby test/browsertest.rb <options>
 
 require 'selenium-webdriver'
 
-require './travisci/browsertest.rb'
+require './test/browsertest.rb'
 
 # main
 

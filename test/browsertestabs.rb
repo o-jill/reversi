@@ -3,7 +3,7 @@
 
 require 'selenium-webdriver'
 
-require './travisci/testresult.rb'
+require './test/testresult.rb'
 
 # base for testing pages on a browser
 class BrowserTestAbstract
@@ -26,17 +26,17 @@ class BrowserTestAbstract
   def simplecheck(pageurl)
     driver.navigate.to BASE_URL + pageurl
     sleep 0.1
-    res.checktitle
+    # res.checktitle
     # puts driver.page_source
-    res.checkfooter
+    # res.checkfooter
   end
 
   def simpleurlcheck(url)
     res.checkurl(BASE_URL + url)
     sleep 0.1
-    res.checktitle
+    # res.checktitle
     # puts driver.page_source
-    res.checkfooter
+    # res.checkfooter
   end
 
   def simplecheckmatch(url, rex)

@@ -3,8 +3,8 @@
 
 require 'selenium-webdriver'
 
-require './travisci/browsertestabs.rb'
-require './travisci/testresult.rb'
+require './test/browsertestabs.rb'
+require './test/testresult.rb'
 
 # test pages on a browser
 class BrowserTest < BrowserTestAbstract
@@ -19,12 +19,24 @@ class BrowserTest < BrowserTestAbstract
   def simpleaccess
     simplecheck 'index.html'
 
-    for n in 1..62 do
-      clickbtn(:id, 'commv')
-      sleep 0.5
+    old = ""
+    kifu = ""
+    loop do
+      clickbtn(:id, 'btncommv')
+
+      loop do
+        sleep 0.5
+        kifu = driver.find_element(:id, 'kifu').attribute(:value)
+        break if old != kifu
+      end
+
+      break if kifu.include?('の勝ち')
+      break if kifu.include?('引き分け')
+
+      old = kifu
     end
 
-    puts "result:\n#{driver.find_element(:id, 'kifu').attribute(:value)}"
+    puts "result:\n#{kifu}\n"
   end
 
   def run
