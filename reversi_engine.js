@@ -150,6 +150,7 @@ function evaluate(c)
     sum += evaltbl[i]*c[i];
   }
   sum += fixedstones(c) * 10;
+//  console.info("leaf:%d", sum);
   return sum;
 }
 
@@ -322,6 +323,7 @@ function genmove(c, tbn)
       y = (i-x)/NUMCELL;
       if (checkreverse(c, x, y, tbn)) {
         te.push({x: x, y: y, hyoka: null, child:null});
+        // console.log("genmove %d,%d", x, y);
       }
     }
   }
@@ -341,9 +343,11 @@ function genandeval(node, c, teban, depth)
   node.child = child;
   if (child.length == 0) {  // 指し手無し ≒ パス
     node.kyokumensu = 1;
+    node.child = null;
     let val = count(c)*200;
-// console.log("f%d:%d:%d",depth,teban,val);
-    return val;
+//  console.log("pass @d%d ban:%d val:%d",depth,teban,val);
+    node.hyoka = val;
+    return node;
   }
 
   let celltmp = new Array(NUMCELL*NUMCELL);
@@ -365,9 +369,16 @@ function genandeval(node, c, teban, depth)
     }
     sum += child[i].kyokumensu;
 // console.log("c%d:%d,%d:%d:%d",depth,x,y,teban,val);
+// console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
+//             node.hyoka*teban, val, teban, val*teban, depth);
+// console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
+      // if (node.best != null) console.log(
+      //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
+      //   teban, node.hyoka, val, depth);
       node.best = node.child[i];
-      node.hyoka = node.child[i].hyoka;  // node.hyoka = node.best.hyoka;
+      node.hyoka = val;  // node.hyoka = node.best.hyoka;
+//  console.log("updated!")
     } else {
       // メモリ解放のつもり
       child[i] = null;
@@ -434,11 +445,17 @@ function genandeval_shuffle(node, c, teban, depth)
       val = val.hyoka;
     }
     sum += child[i].kyokumensu;
+//  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
+//              node.hyoka*teban, val, teban, val*teban, depth);
+//  console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
+      // if (node.best != null) console.log(
+      //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
       node.hyoka = val;  // node.child[i].hyoka;  // node.best.hyoka;
 // console.info("updated!%d,%d:%d:%d",
 //              node.best.x, node.best.y, teban, node.hyoka);
+// console.log("updated!")
     } else {
       // メモリ解放のつもり
       child[i] = null;
@@ -460,7 +477,7 @@ function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0};
   hinto = genandeval_shuffle(hinto, c, teban, n);
-
+  console.log("best:%d, %d nodes.", hinto.hyoka, hinto.kyokumensu)
   return [hinto.best, hinto.kyokumensu];
 }
 
