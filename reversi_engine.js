@@ -374,7 +374,7 @@ function genandeval(node, c, teban, depth)
 // console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
       node.best = node.child[i];
-      node.hyoka = node.child[i].hyoka;  // node.hyoka = node.best.hyoka;
+      node.hyoka = val;  // node.hyoka = node.best.hyoka;
 //  console.log("updated!")
     } else {
       // メモリ解放のつもり
