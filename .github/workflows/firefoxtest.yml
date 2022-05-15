@@ -74,7 +74,7 @@ jobs:
       continue-on-error: true # とにかくログを保存するとこまで行きたい
       id: usecase
       run: |
-        ruby ./test/browsertestmain.sh ${{ matrix.kifu }}
+        ruby ./test/browsertestmain.rb ${{ matrix.kifu }}
       env:
         DISPLAY: :99
 #    - name: save taikyoku logs
