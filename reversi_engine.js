@@ -150,7 +150,7 @@ function evaluate(c)
     sum += evaltbl[i]*c[i];
   }
   sum += fixedstones(c) * 10;
-  console.info("leaf:%d", sum);
+//  console.info("leaf:%d", sum);
   return sum;
 }
 
@@ -373,6 +373,9 @@ function genandeval(node, c, teban, depth)
 //             node.hyoka*teban, val, teban, val*teban, depth);
 // console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
+      // if (node.best != null) console.log(
+      //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
+      //   teban, node.hyoka, val, depth);
       node.best = node.child[i];
       node.hyoka = val;  // node.hyoka = node.best.hyoka;
 //  console.log("updated!")
@@ -446,6 +449,8 @@ function genandeval_shuffle(node, c, teban, depth)
 //              node.hyoka*teban, val, teban, val*teban, depth);
 //  console.dir(node);
     if (node.best == null || node.hyoka*teban < val*teban) {
+      // if (node.best != null) console.log(
+      //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
       node.hyoka = val;  // node.child[i].hyoka;  // node.best.hyoka;
 // console.info("updated!%d,%d:%d:%d",
@@ -472,7 +477,7 @@ function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0};
   hinto = genandeval_shuffle(hinto, c, teban, n);
-console.log("best:%d, %d nodes.", hinto.hyoka, hinto.kyokumensu)
+  console.log("best:%d, %d nodes.", hinto.hyoka, hinto.kyokumensu)
   return [hinto.best, hinto.kyokumensu];
 }
 
