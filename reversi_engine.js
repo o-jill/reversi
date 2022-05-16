@@ -154,6 +154,69 @@ function evaluate(c)
   return sum;
 }
 
+var evaltbl2 = [
+  20, -5, 5, 3, 3, 5, -5, 20,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  20, -5, 5, 3, 3, 5, -5, 20,
+
+  20, -5, 5, 3, 3, 5, -5, 20,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  20, -5, 5, 3, 3, 5, -5, 20,
+
+  20, -5, 5, 3, 3, 5, -5, 20,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  20, -5, 5, 3, 3, 5, -5, 20,
+
+  20, -5, 5, 3, 3, 5, -5, 20,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  3, 1, 1, 0, 0, 1, 1, 3,
+  5, 1, 1, 1, 1, 1, 1, 5,
+  -5, -5, 1, 1, 1, 1, -5, -5,
+  20, -5, 5, 3, 3, 5, -5, 20,
+
+  /* 2nd layer */
+  0, 0, 0, 0
+];
+
+function init_ev2()
+{
+  for (let i = 0; i < NUMCELL * NUMCELL * 4 + 4; ++i) {
+    evaltbl2[i] += Math.random() * 2 - 1;
+  }
+}
+init_ev2();
+
+function evaluate2(c) {
+  let sum = 0;
+  for (let j = 0; j < 4; ++j) {
+    let sum1 = 0;
+    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
+      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL] * c[i];
+    }
+    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL] / (1 + Math.exp(sum1));
+  }
+  // sum += fixedstones(c) * 10;
+  //  console.info("leaf:%d", sum);
+  return 1 / (1 + Math.exp(sum));
+}
+
 function reverse(c, xc, yc)
 {
   let i, j = -1;
@@ -336,7 +399,8 @@ function genandeval(node, c, teban, depth)
   if (depth == 0) {
     node.kyokumensu = 1;
     node.child = null;
-    return evaluate(c);
+    return evaluate2(c);
+    // return evaluate(c);
   }
 
   let child = genmove(c, teban);
