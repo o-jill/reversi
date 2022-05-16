@@ -163,7 +163,7 @@ var evaltbl2 = [
   5, 1, 1, 1, 1, 1, 1, 5,
   -5, -5, 1, 1, 1, 1, -5, -5,
   20, -5, 5, 3, 3, 5, -5, 20,
-
+  0,
   20, -5, 5, 3, 3, 5, -5, 20,
   -5, -5, 1, 1, 1, 1, -5, -5,
   5, 1, 1, 1, 1, 1, 1, 5,
@@ -172,7 +172,7 @@ var evaltbl2 = [
   5, 1, 1, 1, 1, 1, 1, 5,
   -5, -5, 1, 1, 1, 1, -5, -5,
   20, -5, 5, 3, 3, 5, -5, 20,
-
+  0,
   20, -5, 5, 3, 3, 5, -5, 20,
   -5, -5, 1, 1, 1, 1, -5, -5,
   5, 1, 1, 1, 1, 1, 1, 5,
@@ -181,7 +181,7 @@ var evaltbl2 = [
   5, 1, 1, 1, 1, 1, 1, 5,
   -5, -5, 1, 1, 1, 1, -5, -5,
   20, -5, 5, 3, 3, 5, -5, 20,
-
+  0,
   20, -5, 5, 3, 3, 5, -5, 20,
   -5, -5, 1, 1, 1, 1, -5, -5,
   5, 1, 1, 1, 1, 1, 1, 5,
@@ -190,30 +190,32 @@ var evaltbl2 = [
   5, 1, 1, 1, 1, 1, 1, 5,
   -5, -5, 1, 1, 1, 1, -5, -5,
   20, -5, 5, 3, 3, 5, -5, 20,
-
+  0,
   /* 2nd layer */
-  0, 0, 0, 0
+  0, 0, 0, 0,
+  0
 ];
 
 function init_ev2()
 {
-  for (let i = 0; i < NUMCELL * NUMCELL * 4 + 4; ++i) {
+  for (let i = 0; i < NUMCELL * NUMCELL * 4 + 4 + 5; ++i) {
     evaltbl2[i] += Math.random() * 2 - 1;
   }
 }
 init_ev2();
 
 function evaluate2(c) {
-  let sum = 0;
+  let sum = evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4];
   for (let j = 0; j < 4; ++j) {
-    let sum1 = 0;
+    let sum1 = evaltbl2[j * (NUMCELL * NUMCELL + 1) + NUMCELL * NUMCELL];
     for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
-      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL] * c[i];
+      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL + j] * c[i];
     }
-    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL] / (1 + Math.exp(sum1));
+    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] / (1 + Math.exp(sum1));
   }
   // sum += fixedstones(c) * 10;
   //  console.info("leaf:%d", sum);
+  return sum;
   return 1 / (1 + Math.exp(sum));
 }
 
