@@ -58,14 +58,11 @@ jobs:
     - name: Setup gems
       run: |
         gem install webrick -v1.7.0
-        gem install mailcatcher
         gem install rubyzip -v2.3
         gem install selenium-webdriver -v4.1
         gem install unindent
     - name: launch xvfb
       run: Xvfb :99 &
-    - name: launch mail server
-      run: mailcatcher
     - name: launch web server
       run: |
         ruby ./test/webserver.rb 2>web.log &
