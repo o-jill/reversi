@@ -609,7 +609,7 @@ function COMmove()
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:3});
+  workerthread.postMessage({cmd: 'move', cells:cells, teban:teban, depth:3});
 
   draw();
 }
@@ -623,7 +623,7 @@ function COMmoveR()
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:7});
+  workerthread.postMessage({cmd: 'move', cells:cells, teban:teban, depth:7});
 
   draw();
 }
@@ -684,6 +684,7 @@ workerthread.onmessage = function(e)
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
   let duration = e.data.duration;
+  let hyoka = e.data.hyoka;
 
   let x = -1, y = -1;
   if (hinto != null) {

@@ -477,8 +477,8 @@ function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0};
   hinto = genandeval_shuffle(hinto, c, teban, n);
-  console.log("best:%d, %d nodes.", hinto.hyoka, hinto.kyokumensu)
-  return [hinto.best, hinto.kyokumensu];
+  console.log("best:%f, %d nodes.", hinto.hyoka, hinto.kyokumensu)
+  return [hinto.best, hinto.kyokumensu, hinto.hyoka];
 }
 
 /**
@@ -487,18 +487,23 @@ function hintNr(c, teban, n)
  * @return {Object}   {hinto:, kyokumensu:, duration:}
  */
 onmessage = function (e) {
-  let teban = e.data.teban;
-  let cells = e.data.cells;
-  let depth = e.data.depth;
+  let cmd = e.data.cmd;
+  if (cmd == 'move') {
+    let teban = e.data.teban;
+    let cells = e.data.cells;
+    let depth = e.data.depth;
 
-  let starttime = new Date().getTime();
+    let starttime = new Date().getTime();
 
-  let [hinto, kyokumensu] = hintNr(cells, teban, depth);
+    let [hinto, kyokumensu, hyoka] = hintNr(cells, teban, depth);
 
-  let finishtime = new Date().getTime();
-  let duration = finishtime - starttime;
+    let finishtime = new Date().getTime();
+    let duration = finishtime - starttime;
 
-  this.postMessage({hinto:hinto, kyokumensu:kyokumensu, duration:duration});
+    this.postMessage(
+      {hinto:hinto, kyokumensu:kyokumensu, hyoka: hyoka, duration:duration}
+      );
+  }
 };
 
 function move(c, x, y, t)
