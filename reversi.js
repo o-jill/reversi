@@ -283,7 +283,7 @@ function movestr(c, x, y, tb, ts, kms, tm)
   } else if (tb == GOTE) {
     str += " 白 ";
   } else {
-    str += " 終了";
+    str += " 終了 ";
   }
 
   let cnt = count(c);
