@@ -36,7 +36,7 @@ var tesuu = 1;
 var pass = 0;
 
 var enableclick = true;
-var workerthread = new Worker('reversi_engine.js');
+var workerthread = new Worker('reversi_engine.js?v001');
 const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
