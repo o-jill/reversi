@@ -219,6 +219,48 @@ function evaluate2(c) {
   return 1 / (1 + Math.exp(sum));
 }
 
+function traing(kyokumen, bwin, eta)
+{
+  // foward
+  var sum = evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4];
+  var hid = [0, 0, 0, 0, 0];
+  var hidsig = [0, 0, 0, 0, 0];
+  for (let j = 0; j < 4; ++j) {
+    let sum1 = evaltbl2[j * (NUMCELL * NUMCELL + 1) + NUMCELL * NUMCELL];
+    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
+      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL + j] * kyokumen[i];
+    }
+    hid[j] = sum1;
+    hidsig[j] = 1 / (1 + Math.exp(sum1));
+    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] * hidsig[i];
+  }
+
+  // back to hidden
+  var diff = bwin == 1 ? sum - bwin : sum;
+  // let diff = sum - bwin;
+  for (let j = 0; j < 4; ++j) {
+    evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] -= hidsig[j] * diff * eta;
+  }
+  evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4] -= diff * eta;
+
+  var dhid = [0, 0, 0, 0, 0];
+  for (let j = 0; j < 4; ++j) {
+    let tmp = evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] * diff;
+    let sig = 1 / (1 + Math.exp(hid[j]));
+    dhid[j] = tmp * sig * (1 - sig);
+  }
+
+  // back to input
+  for (let j = 0; j < 4; ++j) {
+    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
+      evaltbl2[j + j * NUMCELL * NUMCELL + i]
+          -= dhid[j] * kyokumen[i] * eta;
+    }
+    evaltbl2[j + j * NUMCELL * NUMCELL + NUMCELL * NUMCELL]
+      -= dhid[j] * 1 * eta;
+  }
+}
+
 function reverse(c, xc, yc)
 {
   let i, j = -1;
