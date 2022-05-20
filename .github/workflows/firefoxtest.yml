@@ -74,11 +74,12 @@ jobs:
         ruby ./test/browsertestmain.rb ${{ matrix.kifu }}
       env:
         DISPLAY: :99
-#    - name: save taikyoku logs
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: taikyoku_firefox${{ matrix.ruby-version }}-kifu${{ matrix.kifu }}
-#        path: |
+    - name: save taikyoku logs
+      uses: actions/upload-artifact@v2
+      with:
+        name: taikyoku_firefox${{ matrix.ruby-version }}-kifu${{ matrix.kifu }}
+        path: |
+           kifu
 #          config
 #          db
 #          log
