@@ -16,8 +16,17 @@ class BrowserTest < BrowserTestAbstract
 
   TESTTBL = %w[simpleaccess].freeze
 
-  def simpleaccess
-    simplecheck 'index.html'
+  def getkifu
+    driver.find_element(:id, 'kifu').attribute(:value)
+  end
+
+  def kifu2file(path, txt = nil)
+    File.write(path, txt || getkifu)
+  end
+
+  def play(idx)
+    clickbtn(:id, 'btninit')
+    sleep 0.5
 
     old = ""
     kifu = ""
@@ -26,7 +35,7 @@ class BrowserTest < BrowserTestAbstract
 
       loop do
         sleep 0.5
-        kifu = driver.find_element(:id, 'kifu').attribute(:value)
+        kifu = getkifu
         break if old != kifu
       end
 
@@ -36,7 +45,17 @@ class BrowserTest < BrowserTestAbstract
       old = kifu
     end
 
-    puts "result:\n#{kifu}\n"
+    path = format("kifu%09d.txt", idx)
+    kifu2file(path, kifu)
+    # puts "result:\n#{kifu}\n"
+    puts File.read(path)
+  end
+
+  def simpleaccess
+    simplecheck 'index.html'
+    3.times do |idx|
+      play idx
+    end
   end
 
   def run
