@@ -612,6 +612,10 @@ onmessage = function (e) {
     this.postMessage(
       {hinto:hinto, kyokumensu:kyokumensu, hyoka: hyoka, duration:duration}
       );
+  } else if (cmd == 'evaltbl') {
+    this.postMessage(
+      { cmd: 'evaltbl', evaltbl: evaltbl2 }
+    );
   }
 };
 

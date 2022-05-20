@@ -681,6 +681,12 @@ function hint()
 
 workerthread.onmessage = function(e)
 {
+  let cmd = e.data.cmd;
+  if (cmd == 'evaltbl') {
+    let et = e.data.evaltbl;
+    hintt.value = et.join(',');
+    return;
+  }
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
   let duration = e.data.duration;
@@ -776,4 +782,9 @@ function copykifu()
 {
   kifu.select();
   document.execCommand('copy');
+}
+
+function showevaltbl()
+{
+  workerthread.postMessage({ cmd: 'evaltbl' });
 }
