@@ -45,7 +45,7 @@ class BrowserTest < BrowserTestAbstract
       old = kifu
     end
 
-    path = format("kifu%09d.txt", idx)
+    path = format("kifu/kifu%09d.txt", idx)
     kifu2file(path, kifu)
     # puts "result:\n#{kifu}\n"
     puts File.read(path)
