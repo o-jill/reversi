@@ -198,7 +198,7 @@ var evaltbl2 = [
 
 function init_ev2()
 {
-  for (let i = 0; i < evaltbl2.length() ; ++i) {
+  for (let i = 0; i < evaltbl2.length ; ++i) {
     evaltbl2[i] = Math.random() * Math.sqrt(6)
         / Math.sqrt(NUMCELL * NUMCELL * 4 + 4 + 1);
   }
