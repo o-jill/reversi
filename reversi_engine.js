@@ -180,7 +180,7 @@ function evaluate2(c) {
   return 1 / (1 + Math.exp(sum));
 }
 
-function traing(kyokumen, bwin, eta)
+function training(kyokumen, bwin, eta)
 {
   // foward
   var sum = evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4];
