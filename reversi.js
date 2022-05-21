@@ -267,7 +267,7 @@ function keiseibar(c)
   prgs.value = cnt+64;
 }
 
-function movestr(c, x, y, tb, ts, kms, tm)
+function movestr(c, x, y, tb, ts, kms, tm, rfen)
 {
   let str = ts.toString(10) + "手目 ";
   if (x < 0 || y < 0) {
@@ -301,6 +301,10 @@ function movestr(c, x, y, tb, ts, kms, tm)
   if (tm != null && tm >= 0) {
     str += " ";
     str += tm + "msec";
+  }
+
+  if (rfen) {
+    str += ' ' + rfen;
   }
 
   str += "\n";
@@ -348,7 +352,7 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         cells = move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0);
+        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0, toRFEN(cells));
 
         ++tesuu;
         pass = 0;
@@ -376,13 +380,13 @@ function onClick(e)
           } else if (teban == GOTE) {
             teban = SENTE;
           }
-          kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0);
+          kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0, toRFEN(cells));
         }
       }
     }
 
     if (bnextmove && teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0, toRFEN(cells));
     }
     gotobottom(kifu);
     draw();
@@ -714,7 +718,7 @@ workerthread.onmessage = function(e)
     ++pass;
   }
 
-  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
+  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration, toRFEN(cells));
 
   ++tesuu;
   // 手番変更
@@ -736,7 +740,7 @@ workerthread.onmessage = function(e)
     COMmoveR();
   } else {
     if (teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0, toRFEN(cells));
     }
   }
   if (hinto != null) {
@@ -814,4 +818,43 @@ function readkifu()
     console.log("UNKNOWN");
   }
 
+}
+
+const BLACKN = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '*',];
+const WHITEN = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', '*',];
+
+function toRFEN(cells)
+{
+  let result = new Array(NUMCELL);
+  for (let i = 0; i < NUMCELL; ++i) {
+    let line = '';
+    let c = cells[i * NUMCELL];
+    let l = 0;
+    for (let j = 1; j < NUMCELL; ++j) {
+      if (c == cells[i * NUMCELL + j]) {
+        ++l;
+        continue;
+      }
+      if (c == SENTE) {
+        line += BLACKN[l];
+      } else if (c == GOTE) {
+        line += WHITEN[l];
+      } else if (c == BLANK) {
+        line += '' + (l + 1);
+      }
+      c = cells[i * NUMCELL + j];
+      l = 0;
+    }
+
+    if (c == SENTE) {
+      line += BLACKN[l];
+    } else if (c == GOTE) {
+      line += WHITEN[l];
+    } else if (c == BLANK) {
+      line += '' + (l + 1);
+    }
+    result[i] = line;
+  }
+
+  return result.join('/');
 }
