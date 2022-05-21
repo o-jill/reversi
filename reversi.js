@@ -355,14 +355,12 @@ function onClick(e)
         bnextmove = true;
 
         // 手番変更
-        if (teban == SENTE) {
+        if (checkfinished(cells)) {
+          teban = BLANK;
+        } else if (teban == SENTE) {
           teban = GOTE;
         } else if (teban == GOTE) {
-          if (tesuu > NUMCELL*NUMCELL-4) {
-            teban = BLANK;
-          } else {
-            teban = SENTE;
-          }
+          teban = SENTE;
         }
       } else {
         let te = genmove(cells, teban);
@@ -371,14 +369,12 @@ function onClick(e)
           ++tesuu;
           ++pass;
           bnextmove = true;
-          if (pass >= 2) {
+          if (pass >= 2 || checkfinished(cells)) {
             teban = BLANK;
-          } else {
-            if (teban == SENTE) {
-              teban = GOTE;
-            } else if (teban == GOTE) {
-              teban = SENTE;
-            }
+          } else if (teban == SENTE) {
+            teban = GOTE;
+          } else if (teban == GOTE) {
+            teban = SENTE;
           }
           kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0);
         }
@@ -398,6 +394,16 @@ function onClick(e)
   // inp.value = evaluate(cells).toString(10) + "," + strteban();
 }
 
+/**
+ * @param cells 盤の情報
+ */
+function checkfinished(cells)
+{
+  for (let c of cells) {
+    if (c == BLANK) return false;
+  }
+  return true;
+}
 
 /**
  * @param c 盤の情報
