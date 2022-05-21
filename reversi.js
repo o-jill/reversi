@@ -718,14 +718,12 @@ workerthread.onmessage = function(e)
 
   ++tesuu;
   // 手番変更
-  if (pass >= 2) {
+  if (pass >= 2 || checkfinished(cells)) {
     teban = BLANK;
-  } else {
-    if (teban == SENTE) {
-      teban = GOTE;
-    } else if (teban == GOTE) {
-      teban = SENTE;
-    }
+  } else if (teban == SENTE) {
+    teban = GOTE;
+  } else if (teban == GOTE) {
+    teban = SENTE;
   }
   draw();
   keiseibar(cells);
