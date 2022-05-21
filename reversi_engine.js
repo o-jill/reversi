@@ -21,6 +21,7 @@
 // const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
+const CELL2D = NUMCELL * NUMCELL;
 
 function count(c)
 {
@@ -154,25 +155,33 @@ function evaluate(c)
   return sum;
 }
 
-var evaltbl2 = new Float32Array(NUMCELL * NUMCELL * 4 + 4 + 4 + 1);
+/*
+ * input: NUMCELL * NUMCELL + 1(teban) + 1
+ * hidden: 4 + 1
+ * output: 1
+ */
+var evaltbl2 = new Float32Array(CELL2D * 4 + 4 + 4 + 4 + 1);
 
 function init_ev2()
 {
-  let range = Math.sqrt(6) / Math.sqrt(NUMCELL * NUMCELL + 4 + 1);
+  let range = Math.sqrt(6) / Math.sqrt(CELL2D + 1 + 4 + 1);
   for (let i = 0; i < evaltbl2.length ; ++i) {
     evaltbl2[i] = Math.random() * 2 * range - range;
   }
 }
 init_ev2();
 
-function evaluate2(c) {
-  let sum = evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4];
+function evaluate2(c, teban) {
+  let sum = evaltbl2.slice(-1)[0];
+  let w2 = evaltbl2.slice(-5);
   for (let j = 0; j < 4; ++j) {
-    let sum1 = evaltbl2[j * (NUMCELL * NUMCELL + 1) + NUMCELL * NUMCELL];
-    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
-      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL + j] * c[i];
+    let w1 = evaltbl2.slice(j * (CELL2D + 2));
+    let wlast2 = w1.slice(-2);
+    let sum1 = wlast2[0] * teban + wlast2[1];
+    for (let i = 0; i < CELL2D; ++i) {
+      sum1 += w1[i] * c[i];
     }
-    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] / (1 + Math.exp(sum1));
+    sum += w2[j] / (1 + Math.exp(sum1));
   }
   // sum += fixedstones(c) * 10;
   //  console.info("leaf:%d", sum);
@@ -180,44 +189,49 @@ function evaluate2(c) {
   return 1 / (1 + Math.exp(sum));
 }
 
-function training(kyokumen, bwin, eta)
+function training(kyokumen, teban, bwin, eta)
 {
   // foward
-  var sum = evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4];
+  var sum = evaltbl2.slice(-1)[0];
   var hid = [0, 0, 0, 0, 0];
   var hidsig = [0, 0, 0, 0, 0];
+  let w2 = evaltbl2.slice(-5);
   for (let j = 0; j < 4; ++j) {
-    let sum1 = evaltbl2[j * (NUMCELL * NUMCELL + 1) + NUMCELL * NUMCELL];
-    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
-      sum1 += evaltbl2[i + j * NUMCELL * NUMCELL + j] * kyokumen[i];
+    let w1 = evaltbl2.slice(j * (CELL2D + 2));
+    let wlast2 = w1.slice(-2);
+    let sum1 = wlast2[0] * teban + wlast2[1];
+    for (let i = 0; i < CELL2D; ++i) {
+      sum1 += w1[i] * kyokumen[i];
     }
     hid[j] = sum1;
     hidsig[j] = 1 / (1 + Math.exp(sum1));
-    sum += evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] * hidsig[i];
+    sum += w2[j] * hidsig[i];
   }
 
   // back to hidden
   var diff = bwin == 1 ? sum - bwin : sum;
   // let diff = sum - bwin;
   for (let j = 0; j < 4; ++j) {
-    evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] -= hidsig[j] * diff * eta;
+    evaltbl2[j + 4 * CELL2D + 8] -= hidsig[j] * diff * eta;
   }
-  evaltbl2[4 + 4 * NUMCELL * NUMCELL + 4] -= diff * eta;
+  evaltbl2[4 + 4 * CELL2D + 8] -= diff * eta;
 
   var dhid = [0, 0, 0, 0, 0];
   for (let j = 0; j < 4; ++j) {
-    let tmp = evaltbl2[j + 4 * NUMCELL * NUMCELL + 4] * diff;
+    let tmp = evaltbl2[j + 4 * CELL2D + 8] * diff;
     let sig = 1 / (1 + Math.exp(hid[j]));
     dhid[j] = tmp * sig * (1 - sig);
   }
 
   // back to input
   for (let j = 0; j < 4; ++j) {
-    for (let i = 0; i < NUMCELL * NUMCELL; ++i) {
-      evaltbl2[j + j * NUMCELL * NUMCELL + i]
+    for (let i = 0; i < CELL2D; ++i) {
+      evaltbl2[j * (2 + CELL2D) + i]
           -= dhid[j] * kyokumen[i] * eta;
     }
-    evaltbl2[j + j * NUMCELL * NUMCELL + NUMCELL * NUMCELL]
+    evaltbl2[j * (2 + CELL2D) + CELL2D]
+      -= dhid[j] * teban * eta;
+    evaltbl2[j * (2 + CELL2D) + CELL2D + 1]
       -= dhid[j] * 1 * eta;
   }
 }
@@ -404,7 +418,7 @@ function genandeval(node, c, teban, depth)
   if (depth == 0) {
     node.kyokumensu = 1;
     node.child = null;
-    return evaluate2(c);
+    return evaluate2(c, teban);
     // return evaluate(c);
   }
 
