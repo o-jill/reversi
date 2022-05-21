@@ -792,3 +792,26 @@ function showevaltbl()
 {
   workerthread.postMessage({ cmd: 'evaltbl' });
 }
+
+function readkifu()
+{
+  let result = kifu.value;
+  let lines = result.split('\n');
+  let moves = "moves:";
+  for (let l of lines) {
+    let elem = l.split(' ');
+    moves += ' ' + Number(elem[1]);
+  }
+  console.log(moves);
+
+  if (result.indexOf("●の勝ち") >= 0) {
+    console.log("BLACK WON");
+  } else if (result.indexOf("◯の勝ち") >= 0) {
+    console.log("WHITE WON");
+  } else if (result.indexOf("引き分け") >= 0) {
+    console.log("DRAW");
+  } else {
+    console.log("UNKNOWN");
+  }
+
+}
