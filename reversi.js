@@ -817,7 +817,6 @@ function readkifu()
   } else {
     console.log("UNKNOWN");
   }
-
 }
 
 const BLACKN = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '*',];
@@ -857,4 +856,46 @@ function toRFEN(cells)
   }
 
   return result.join('/');
+}
+
+const NBLACK = "ABCDEFGH";
+const NWHITE = "abcdefgh";
+const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8";
+
+function fromRFEN(rfen)
+{
+  let cells = new Array(NUMCELL * NUMCELL);
+  let icell = 0;
+
+  for (let i = 0; i < rfen.length; ++i) {
+    let ch = rfen[i];
+    let j = NBLACK.indexOf(ch);
+    if (j >= 0) {
+      while( j >= 0 ) {
+        cells[icell] = SENTE;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+    j = NWHITE.indexOf(ch);
+    if (j >= 0) {
+      while (j >= 0) {
+        cells[icell] = GOTE;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+    j = Number(ch);
+    if (!isNaN(j)) {
+      while (j > 0) {
+        cells[icell] = BLANK;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+  }
+  return cells;
 }
