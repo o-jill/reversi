@@ -40,6 +40,7 @@ var workerthread = new Worker('reversi_engine.js?v001');
 const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
+var ntrain = 0;
 
 function draw()
 {
@@ -696,6 +697,12 @@ workerthread.onmessage = function(e)
     let et = e.data.evaltbl;
     hintt.value = et.join(',');
     return;
+  } else if (cmd == 'train') {
+    --ntrain;
+    if (ntrain == 0) {
+      window.alert('training done!');
+    }
+    return;
   }
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
@@ -801,21 +808,44 @@ function readkifu()
 {
   let result = kifu.value;
   let lines = result.split('\n');
-  let moves = "moves:";
+  let moves = [];
+  let rfen = [];
   for (let l of lines) {
     let elem = l.split(' ');
-    moves += ' ' + Number(elem[1]);
+    moves.push(Number(elem[1]));
+    rfen.push(elem.slice(-1)[0]);
   }
-  console.log(moves);
+  // console.log("moves:" + moves.join(' '));
 
+  let output = NaN;
   if (result.indexOf("●の勝ち") >= 0) {
-    console.log("BLACK WON");
+    // console.log("BLACK WON");
+    output = SENTE;
   } else if (result.indexOf("◯の勝ち") >= 0) {
-    console.log("WHITE WON");
+    // console.log("WHITE WON");
+    output = GOTE;
   } else if (result.indexOf("引き分け") >= 0) {
-    console.log("DRAW");
+    // console.log("DRAW");
+    output = 0;
   } else {
-    console.log("UNKNOWN");
+    // console.log("UNKNOWN");
+    return;
+  }
+  ntrain = rfen.length;
+  teban = SENTE;
+  for (let i = 0 ; i < rfen.length ; ++i) {
+    if (isNaN(moves[i])) {
+      --ntrain;
+      continue;
+    }
+
+    workerthread.postMessage(
+      {
+        cmd: 'train', cells: fromRFEN(rfen[i]),
+        teban: teban, output: output, eta: 0.001
+      }
+    );
+    teban = -teban;
   }
 }
 

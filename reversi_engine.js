@@ -205,7 +205,7 @@ function training(kyokumen, teban, bwin, eta)
     }
     hid[j] = sum1;
     hidsig[j] = 1 / (1 + Math.exp(sum1));
-    sum += w2[j] * hidsig[i];
+    sum += w2[j] * hidsig[j];
   }
 
   // back to hidden
@@ -571,7 +571,14 @@ function hintNr(c, teban, n)
  */
 onmessage = function (e) {
   let cmd = e.data.cmd;
-  if (cmd == 'move') {
+  if (cmd == 'train') {
+    let teban = e.data.teban;
+    let cells = e.data.cells;
+    let output = e.data.output;
+    let eta = e.data.eta;
+    training(cells, teban, output, eta);
+    this.postMessage({ cmd: cmd });
+  } else if (cmd == 'move') {
     let teban = e.data.teban;
     let cells = e.data.cells;
     let depth = e.data.depth;
@@ -587,9 +594,7 @@ onmessage = function (e) {
       {hinto:hinto, kyokumensu:kyokumensu, hyoka: hyoka, duration:duration}
       );
   } else if (cmd == 'evaltbl') {
-    this.postMessage(
-      { cmd: 'evaltbl', evaltbl: evaltbl2 }
-    );
+    this.postMessage({ cmd: cmd, evaltbl: evaltbl2 });
   }
 };
 
