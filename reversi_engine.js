@@ -154,7 +154,7 @@ function evaluate(c)
   return sum;
 }
 
-var evaltbl2 = new Array(NUMCELL * NUMCELL * 4 + 4 + 4 + 1);
+var evaltbl2 = new Float32Array(NUMCELL * NUMCELL * 4 + 4 + 4 + 1);
 
 function init_ev2()
 {
