@@ -756,3 +756,15 @@ function checkreverse(c, xc, yc, color)
   }
   return false;
 }
+
+function rotate180(cells)
+{
+  let res = Array(NUMCELL * NUMCELL);
+  for (let i = 0; i < NUMCELL; ++i) {
+    for (let j = 0; j < NUMCELL; ++j) {
+      res[i * NUMCELL + j] =
+          cells[(NUMCELL - 1 - j) * NUMCELL + NUMCELL - 1 - i];
+    }
+  }
+  return res;
+}
