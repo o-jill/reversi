@@ -7,6 +7,7 @@ var ctx = canvas.getContext('2d');
 const inp = document.getElementById('eval');
 const hintt = document.getElementById('hintt');
 const kifu = document.getElementById('kifu');
+const btnet = document.getElementById('btnupdate');
 
 const cellsize = 50;
 const offset = 5;
@@ -697,11 +698,16 @@ workerthread.onmessage = function(e)
     let et = e.data.evaltbl;
     hintt.value = et.join(',');
     return;
-  } else if (cmd == 'train') {
+  }
+  if (cmd == 'train') {
     --ntrain;
     if (ntrain == 0) {
       window.alert('training done!');
     }
+    return;
+  }
+  if (cmd == 'newevaltbl') {
+    btnet.disables = false;
     return;
   }
   let hinto = e.data.hinto;
@@ -928,4 +934,11 @@ function fromRFEN(rfen)
     }
   }
   return cells;
+}
+
+function updateevaltbl()
+{
+  btnet.disables = true;
+  let et = hintt.value.split(',');
+  workerthread.postMessage({ cmd: 'newevaltbl', evaltbl: et });
 }

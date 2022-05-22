@@ -579,7 +579,9 @@ onmessage = function (e) {
     training(cells, teban, output, eta);
     training(rotate180(cells), teban, output, eta);
     this.postMessage({ cmd: cmd });
-  } else if (cmd == 'move') {
+    return;
+  }
+  if (cmd == 'move') {
     let teban = e.data.teban;
     let cells = e.data.cells;
     let depth = e.data.depth;
@@ -594,8 +596,21 @@ onmessage = function (e) {
     this.postMessage(
       {hinto:hinto, kyokumensu:kyokumensu, hyoka: hyoka, duration:duration}
       );
-  } else if (cmd == 'evaltbl') {
+    return;
+  }
+  if (cmd == 'evaltbl') {
     this.postMessage({ cmd: cmd, evaltbl: evaltbl2 });
+    return;
+  }
+  if (cmd == 'newevaltbl') {
+    let et = e.data.evaltbl;
+    if (evaltbl2.length == et.length) {
+      for (let i = 0 ; i < et.length ; ++i) {
+        evaltbl2[i] = Number(et[i]);
+      }
+    }
+    this.postMessage({ cmd: cmd });
+    return;
   }
 };
 
