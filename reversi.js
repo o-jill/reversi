@@ -7,6 +7,7 @@ var ctx = canvas.getContext('2d');
 const inp = document.getElementById('eval');
 const hintt = document.getElementById('hintt');
 const kifu = document.getElementById('kifu');
+const btnread = document.getElementById('btnread');
 const btnet = document.getElementById('btnupdate');
 
 const cellsize = 50;
@@ -702,7 +703,8 @@ workerthread.onmessage = function(e)
   if (cmd == 'train') {
     --ntrain;
     if (ntrain == 0) {
-      window.alert('training done!');
+      // window.alert('training done!');
+      btnread.disabled = false;
     }
     return;
   }
@@ -812,6 +814,8 @@ function showevaltbl()
 
 function readkifu()
 {
+  btnread.disabled = true;
+
   let result = kifu.value;
   let lines = result.split('\n');
   let moves = [];

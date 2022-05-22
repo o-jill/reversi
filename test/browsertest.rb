@@ -51,10 +51,57 @@ class BrowserTest < BrowserTestAbstract
     puts File.read(path)
   end
 
+  def playr(idx)
+    clickbtn(:id, 'btninit')
+    sleep 0.5
+
+    clickbtn(:id, 'btncommvr')
+    kifu = ""
+    loop do
+      sleep 0.5
+      kifu = getkifu
+
+      break if kifu.include?('の勝ち')
+      break if kifu.include?('引き分け')
+    end
+    # old = ""
+    # kifu = ""
+    # loop do
+    #   clickbtn(:id, 'btncommv')
+
+    #   loop do
+    #     sleep 0.5
+    #     kifu = getkifu
+    #     break if old != kifu
+    #   end
+
+    #   break if kifu.include?('の勝ち')
+    #   break if kifu.include?('引き分け')
+
+    #   old = kifu
+    # end
+
+    clickbtn(:id, 'btnread')
+    loop do
+      elem = driver.find_element(:id, 'btnread')
+      break if elem.enabled?
+      sleep 0.5
+    end
+
+    path = format("kifu/kifu%09d.txt", idx)
+    kifu2file(path, kifu)
+    # puts "result:\n#{kifu}\n"
+    puts File.read(path)
+  end
+
   def simpleaccess
     simplecheck 'index.html'
+
+    clickbtn(:id, 'acmchk')
+    clickbtn(:id, 'acmachk')
+
     3.times do |idx|
-      play idx
+      playr idx
     end
   end
 
