@@ -577,6 +577,7 @@ onmessage = function (e) {
     let output = e.data.output;
     let eta = e.data.eta;
     training(cells, teban, output, eta);
+    training(rotate180(cells), teban, output, eta);
     this.postMessage({ cmd: cmd });
   } else if (cmd == 'move') {
     let teban = e.data.teban;
