@@ -678,19 +678,26 @@ var yBrother = {};
 function waitoBrother()
 {
   if (oBrother == null) {
-    yBrother = e.data;
-    this.setTimeout(waitoBrother, 500);
+    this.setTimeout(waitoBrother, 100);
     return;
   }
 
-  // merge
-  let yhyoka = yBrother.hyoka;
+  mergeResult(yBrother);
+}
+
+/**
+ * merge brothers' thought.
+ * @param {*} ybr a brother's thought.
+ */
+function mergeResult(ybr)
+{
+  let yhyoka = ybr.hyoka;
   let ohyoka = oBrother.hyoka;
   let teban = oBrother.teban;
-  oBrother.kyokumensu += yBrother.kyokumensu;
+  oBrother.kyokumensu += ybr.kyokumensu;
 
   if (yhyoka != null && ohyoka * teban < yhyoka * teban) {
-    oBrother.hyoka = yBrother.best;
+    oBrother.hyoka = ybr.best;
     oBrother.yhyoka = yhyoka;
   }
   let duration = new Date().getTime() - starttime;
@@ -765,22 +772,11 @@ onmessage = function (e) {
   if (cmd == 'partial') {
     if (oBrother == null) {
       yBrother = e.data;
-      this.setTimeout(waitoBrother, 500);
+      this.setTimeout(waitoBrother, 100);
+      return;
     }
     // merge
-    let yhyoka = e.data.hyoka;
-    let ohyoka = oBrother.hyoka;
-    let teban = oBrother.teban;
-    oBrother.kyokumensu += e.data.kyokumensu;
-
-    if (yhyoka != null && ohyoka * teban < yhyoka * teban) {
-      oBrother.hyoka = e.data.best;
-      oBrother.yhyoka = yhyoka;
-    }
-    let duration = new Date().getTime() - starttime;
-    console.debug({odu:oBrother.duration, ndu:duration});
-    oBrother.duration = duration;
-    this.postMessage(oBrother);
+    mergeResult(e.data);
     return;
   }
   if (cmd == 'newevaltbl') {
