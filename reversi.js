@@ -38,7 +38,8 @@ var tesuu = 1;
 var pass = 0;
 
 var enableclick = true;
-var workerthread = new Worker('reversi_engine.js?v001');
+var workerthread = new Worker('reversi_engine.js?v002_1');
+var workerthread2 = new Worker('reversi_engine.js?v002_2');
 const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
@@ -712,6 +713,20 @@ workerthread.onmessage = function(e)
     btnet.disables = false;
     return;
   }
+  /* ask brother think */
+  if (cmd == 'partial') {
+    let data = e.data;
+    data.cmd = 'think';
+    workerthread2.postMessage(data);
+    return;
+  }
+  /* brother's thought */
+  if (cmd == 'think') {
+    let data = e.data;
+    data.cmd = 'partial';
+    workerthread.postMessage(data);
+    return;
+  }
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
   let duration = e.data.duration;
@@ -774,6 +789,16 @@ workerthread.onmessage = function(e)
     hintt.value = str;
   }
   gotobottom(kifu);
+}
+
+workerthread2.onmessage = function (e) {
+  let cmd = e.data.cmd;
+  // finished searching.
+  if (cmd == 'think') {
+    let data = e.data;
+    data.cmd = 'partial';
+    workerthread.postMessage(data);
+  }
 }
 
 /**
