@@ -192,7 +192,7 @@ function evaluate2(c, teban) {
   // sum += fixedstones(c) * 10;
   //  console.info("leaf:%d", sum);
   return sum;
-  return 1 / (1 + Math.exp(sum));
+  // return 1 / (1 + Math.exp(sum));
 }
 
 function training(kyokumen, teban, bwin, eta)
