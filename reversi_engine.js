@@ -32,7 +32,7 @@ var oBrother = null;
 function count(c)
 {
   let sum = 0;
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     sum += c[i];
   }
   return sum;
@@ -92,11 +92,11 @@ function fixedstones(c)
     sum += i;
     total += cnr * sum;
   }
-  if (c[NUMCELL*NUMCELL-NUMCELL] != BLANK) {
-    let cnr = c[NUMCELL*NUMCELL-NUMCELL];
+  if (c[CELL2D-NUMCELL] != BLANK) {
+    let cnr = c[CELL2D-NUMCELL];
     // right
     for (i = 1 ; i < NUMCELL-1 ; ++i) {
-      if (c[NUMCELL*NUMCELL-NUMCELL+i] != cnr)
+      if (c[CELL2D-NUMCELL+i] != cnr)
         break;
     }
     sum = i;
@@ -114,11 +114,11 @@ function fixedstones(c)
     sum += i;
     total += cnr * sum;
   }
-  if (c[NUMCELL*NUMCELL-1] != BLANK) {
-    let cnr = c[NUMCELL*NUMCELL-1];
+  if (c[CELL2D-1] != BLANK) {
+    let cnr = c[CELL2D-1];
     // left
     for (i = 2 ; i < NUMCELL ; ++i) {
-      if (c[NUMCELL*NUMCELL-i] != cnr)  // c[NUMCELL*NUMCELL-1-i]
+      if (c[CELL2D-i] != cnr)  // c[CELL2D-1-i]
         break;
     }
     sum = i-1;
@@ -153,7 +153,7 @@ var evaltbl = [
 function evaluate(c)
 {
   let sum = 0;
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     sum += evaltbl[i]*c[i];
   }
   sum += fixedstones(c) * 10;
@@ -403,7 +403,7 @@ function genmove(c, tbn)
 {
   let te = [];
 
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     let val = c[i];
     if (val === BLANK) {
       let x, y;
@@ -439,10 +439,10 @@ function genandeval(node, c, teban, depth)
     return node;
   }
 
-  let celltmp = new Array(NUMCELL*NUMCELL);
+  let celltmp = new Array(CELL2D);
   let sum  = 0;
   for (let i = 0 ; i < node.child.length ; ++i) {
-    for (let j = 0 ; j < NUMCELL*NUMCELL ; ++j) {
+    for (let j = 0 ; j < CELL2D ; ++j) {
       celltmp[j] = c[j];
     }
     let x = child[i].x;
@@ -585,10 +585,10 @@ function genandeval_partial(child, c, teban, depth) {
   }
 
   // let points = new Array(node.child.length);
-  let celltmp = new Array(NUMCELL * NUMCELL);
+  let celltmp = new Array(CELL2D);
   let sum = 0;
   for (let i = 0; i < child.length; ++i) {
-    for (let j = 0; j < NUMCELL * NUMCELL; ++j) {
+    for (let j = 0; j < CELL2D; ++j) {
       celltmp[j] = c[j];
     }
     let x = child[i].x;
@@ -733,7 +733,7 @@ function move(c, x, y, t)
   return reverse(c, x, y);
 }
 
-// var celltmp = new Array(NUMCELL*NUMCELL);
+// var celltmp = new Array(CELL2D);
 
 /**
  * @param c 盤の情報
@@ -907,7 +907,7 @@ function checkreverse(c, xc, yc, color)
 
 function rotate180(cells)
 {
-  let res = Array(NUMCELL * NUMCELL);
+  let res = Array(CELL2D);
   for (let i = 0; i < NUMCELL; ++i) {
     for (let j = 0; j < NUMCELL; ++j) {
       res[i * NUMCELL + j] =

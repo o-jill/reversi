@@ -16,6 +16,7 @@ const SENTE = 1;
 const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
+const CELL2D = NUMCELL * NUMCELL;
 
 /* 1:黒,0:なし,-1:白*/
 var cells = [
@@ -85,7 +86,7 @@ function draw()
 function count(c)
 {
   let sum = 0;
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     sum += c[i];
   }
   return sum;
@@ -595,7 +596,7 @@ function genmove(c, tbn)
 {
   let te = [];
 
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     let val = c[i];
     if (val === BLANK) {
       let x, y;
