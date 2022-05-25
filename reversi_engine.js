@@ -17,8 +17,8 @@
  *  }
  */
 
-// const SENTE = 1;
-// const GOTE = -1;
+const SENTE = 1;
+const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
 const CELL2D = NUMCELL * NUMCELL;
@@ -426,6 +426,30 @@ function genmove(c, tbn)
   return te;
 }
 
+function debugcells(c, teban)
+{
+  let cells = [];
+  for (let j = 0 ; j < NUMCELL ; ++j) {
+    let line = new Array(NUMCELL);
+    for (let i = 0; i < NUMCELL; ++i) {
+      if (c[i + j * NUMCELL] == SENTE) {
+        line[i] = "●";
+      } else if (c[i + j * NUMCELL] == GOTE) {
+        line[i] = "◯";
+      } else {
+        line[i] = " ";
+      }
+    }
+    cells.push(line);
+  }
+  if (teban == SENTE) {
+    console.debug({ teban: '●' });
+  } else if (teban == GOTE) {
+    console.debug({ teban: '◯' });
+  }
+  console.table(cells);
+}
+
 /** 読みと指手の生成 */
 function genandeval(node, c, teban, depth)
 {
@@ -444,6 +468,7 @@ function genandeval(node, c, teban, depth)
     return node;
   }
   if (child.length == 0) {  // 指し手無し ≒ パス
+    // debugcells(c, teban);
     child = { x: -1, y: -1, hyoka: null, child: null, best: null };
     let val = genandeval(child, c, -teban, depth - 1);
 
