@@ -930,7 +930,7 @@ const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8";
 
 function fromRFEN(rfen)
 {
-  let cells = new Array(NUMCELL * NUMCELL);
+  let cells = new Array(CELL2D);
   let icell = 0;
 
   for (let i = 0; i < rfen.length; ++i) {
