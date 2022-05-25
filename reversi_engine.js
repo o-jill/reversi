@@ -701,7 +701,7 @@ function mergeResult(ybr)
     oBrother.yhyoka = yhyoka;
   }
   let duration = new Date().getTime() - starttime;
-  console.debug({ odu: oBrother.duration, ndu: duration });
+  // console.debug({ odu: oBrother.duration, ndu: duration });
   oBrother.duration = duration;
   this.postMessage(oBrother);
 }
