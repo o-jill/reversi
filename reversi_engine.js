@@ -399,22 +399,30 @@ function reverse(c, xc, yc)
   return c;
 }
 
+/**
+ * generate possible moves.
+ * @param {Array} c cells.
+ * @param {*} tbn teban.
+ * @returns null when no blank cells.
+ */
 function genmove(c, tbn)
 {
   let te = [];
-
+  let nblank = 0;
   for (let i = 0 ; i < CELL2D ; ++i) {
     let val = c[i];
     if (val === BLANK) {
-      let x, y;
-      x = i%NUMCELL;
-      y = (i-x)/NUMCELL;
+      ++nblank;
+
+      let x = i % NUMCELL;
+      let y = (i - x) / NUMCELL;
       if (checkreverse(c, x, y, tbn)) {
-        te.push({x: x, y: y, hyoka: null, child:null});
+        te.push({x: x, y: y, hyoka: null, child:null, best: null});
         // console.log("genmove %d,%d", x, y);
       }
     }
   }
+  if (nblank == 0) return null;
   return te;
 }
 
@@ -424,20 +432,29 @@ function genandeval(node, c, teban, depth)
   if (depth == 0) {
     node.kyokumensu = 1;
     node.child = null;
-    return evaluate2(c, teban);
+    return {hyoka: evaluate2(c, teban)};
     // return evaluate(c);
   }
 
   let child = genmove(c, teban);
-  node.child = child;
-  if (child.length == 0) {  // 指し手無し ≒ パス
+  if (child == null) {  // no blank cells.
     node.kyokumensu = 1;
     node.child = null;
-    let val = count(c)*200;
-//  console.log("pass @d%d ban:%d val:%d",depth,teban,val);
-    node.hyoka = val;
+    node.hyoka = count(c) * 200;
     return node;
   }
+  if (child.length == 0) {  // 指し手無し ≒ パス
+    child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    let val = genandeval(child, c, -teban, depth - 1);
+
+    child.hyoka = val.hyoka;
+    node.child = [child];
+    node.best = node.child[0];
+    node.hyoka = val;
+    node.kyokumensu = child.kyokumensu + 1;
+    return node;
+  }
+  node.child = child;
 
   let celltmp = new Array(CELL2D);
   let sum  = 0;
@@ -450,12 +467,7 @@ function genandeval(node, c, teban, depth)
     celltmp = move(celltmp, x, y, teban);
 
     let val =  genandeval(child[i], celltmp, -teban, depth-1);
-    if (depth == 1) {  // if (val.hyoka == null) {
-      child[i].hyoka = val;
-    } else {
-      child[i].hyoka = val.hyoka;
-      val = val.hyoka;
-    }
+    child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 // console.log("c%d:%d,%d:%d:%d",depth,x,y,teban,val);
 // console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
@@ -466,7 +478,7 @@ function genandeval(node, c, teban, depth)
       //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
       //   teban, node.hyoka, val, depth);
       node.best = node.child[i];
-      node.hyoka = val;  // node.hyoka = node.best.hyoka;
+      node.hyoka = val.hyoka;
 //  console.log("updated!")
     } else {
       // メモリ解放のつもり
@@ -506,11 +518,19 @@ function genandeval_shuffle(node, c, teban, depth)
   }*/
 // console.info('genandeval');
   let child = genmove(c, teban);
+  if (child == null) {  // no blank cells.
+    return null;
+  }
   if (child.length == 0) {  // 指し手無し ≒ パス
-    node.child = child;
-    node.kyokumensu = 1;
-    let val = count(c)*100;
-    return val;
+    child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    let val = genandeval(child, c, -teban, depth - 1);
+
+    child.hyoka = val.hyoka;
+    node.child = [child];
+    node.best = node.child[0];
+    node.hyoka = val;
+    node.kyokumensu = child.kyokumensu + 1;
+    return node;
   }
   // shuffle
   child = shuffle(child);
@@ -540,12 +560,7 @@ function genandeval_shuffle(node, c, teban, depth)
     celltmp = move(celltmp, x, y, teban);
 
     let val =  genandeval(child[i], celltmp, -teban, depth-1);
-    if (depth == 1) {  // if (val.hyoka == null) {
-      child[i].hyoka = val;
-    } else {
-      child[i].hyoka = val.hyoka;
-      val = val.hyoka;
-    }
+    child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
 //              node.hyoka*teban, val, teban, val*teban, depth);
@@ -554,7 +569,7 @@ function genandeval_shuffle(node, c, teban, depth)
       // if (node.best != null) console.log(
       //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
-      node.hyoka = val;  // node.child[i].hyoka;  // node.best.hyoka;
+      node.hyoka = val.hyoka;  // node.child[i].hyoka;  // node.best.hyoka;
 // console.info("updated!%d,%d:%d:%d",
 //              node.best.x, node.best.y, teban, node.hyoka);
 // console.log("updated!")
@@ -596,12 +611,7 @@ function genandeval_partial(child, c, teban, depth) {
     celltmp = move(celltmp, x, y, teban);
 
     let val = genandeval(child[i], celltmp, -teban, depth - 1);
-    if (depth == 1) {  // if (val.hyoka == null) {
-      child[i].hyoka = val;
-    } else {
-      child[i].hyoka = val.hyoka;
-      val = val.hyoka;
-    }
+    child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
@@ -610,7 +620,7 @@ function genandeval_partial(child, c, teban, depth) {
       // if (node.best != null) console.log(
       //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
-      node.hyoka = val;  // node.child[i].hyoka;  // node.best.hyoka;
+      node.hyoka = val.hyoka;
       // console.info("updated!%d,%d:%d:%d",
       //              node.best.x, node.best.y, teban, node.hyoka);
       // console.log("updated!")
