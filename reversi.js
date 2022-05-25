@@ -45,6 +45,7 @@ const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
 var ntrain = 0;
+var initialized = false;
 
 function draw()
 {
@@ -694,12 +695,22 @@ function hint()
   inp.value = txt;
 }
 
+function syncevaltbl(et)
+{
+  btnet.disables = true;  
+  workerthread2.postMessage({ cmd: 'newevaltbl', evaltbl: et });
+}
+
 workerthread.onmessage = function(e)
 {
   let cmd = e.data.cmd;
   if (cmd == 'evaltbl') {
-    let et = e.data.evaltbl;
-    hintt.value = et.join(',');
+    if (!initialized) {
+      syncevaltbl(e.data.evaltbl);
+    } else {
+      let et = e.data.evaltbl;
+      hintt.value += '\n' + et.join(',');
+    }
     return;
   }
   if (cmd == 'train') {
@@ -799,6 +810,16 @@ workerthread2.onmessage = function (e) {
     let data = e.data;
     data.cmd = 'partial';
     workerthread.postMessage(data);
+    return;
+  }
+  if (cmd == 'evaltbl') {
+    let et = e.data.evaltbl;
+    hintt.value += '\n' + et.join(',');
+    return;
+  }
+  if (cmd == 'newevaltbl') {
+    initialized = true;
+    return;
   }
 }
 
@@ -836,6 +857,7 @@ function copykifu()
 function showevaltbl()
 {
   workerthread.postMessage({ cmd: 'evaltbl' });
+  workerthread2.postMessage({ cmd: 'evaltbl' });
 }
 
 function readkifu()
@@ -972,3 +994,13 @@ function updateevaltbl()
   let et = hintt.value.split(',');
   workerthread.postMessage({ cmd: 'newevaltbl', evaltbl: et });
 }
+
+function sendsynceval()
+{
+  initialized = false;
+  workerthread.postMessage({ cmd: 'evaltbl' });
+}
+
+window.addEventListener('load', function(){
+  sendsynceval();
+}, false);
