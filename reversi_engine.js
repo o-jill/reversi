@@ -674,6 +674,32 @@ function hintNr(c, teban, n)
   return [hinto.best, hinto.kyokumensu, hinto.hyoka];
 }
 
+var yBrother = {};
+function waitoBrother()
+{
+  if (oBrother == null) {
+    yBrother = e.data;
+    this.setTimeout(waitoBrother, 500);
+    return;
+  }
+
+  // merge
+  let yhyoka = yBrother.hyoka;
+  let ohyoka = oBrother.hyoka;
+  let teban = oBrother.teban;
+  oBrother.kyokumensu += yBrother.kyokumensu;
+
+  if (yhyoka != null && ohyoka * teban < yhyoka * teban) {
+    oBrother.hyoka = yBrother.best;
+    oBrother.yhyoka = yhyoka;
+  }
+  let duration = new Date().getTime() - starttime;
+  console.debug({ odu: oBrother.duration, ndu: duration });
+  oBrother.duration = duration;
+  this.postMessage(oBrother);
+}
+
+var starttime;
 /**
  * [onmessage description]
  * @param  {Object} e {cells:, teban:, depth:}
@@ -696,7 +722,7 @@ onmessage = function (e) {
     let cells = e.data.cells;
     let depth = e.data.depth;
 
-    let starttime = new Date().getTime();
+    starttime = new Date().getTime();
 
     let [hinto, kyokumensu, hyoka] = hintNr(cells, teban, depth);
 
@@ -737,6 +763,10 @@ onmessage = function (e) {
   }
   /* result from brother */
   if (cmd == 'partial') {
+    if (oBrother == null) {
+      yBrother = e.data;
+      this.setTimeout(waitoBrother, 500);
+    }
     // merge
     let yhyoka = e.data.hyoka;
     let ohyoka = oBrother.hyoka;
@@ -747,6 +777,9 @@ onmessage = function (e) {
       oBrother.hyoka = e.data.best;
       oBrother.yhyoka = yhyoka;
     }
+    let duration = new Date().getTime() - starttime;
+    console.debug({odu:oBrother.duration, ndu:duration});
+    oBrother.duration = duration;
     this.postMessage(oBrother);
     return;
   }
