@@ -450,7 +450,7 @@ function genandeval(node, c, teban, depth)
     child.hyoka = val.hyoka;
     node.child = [child];
     node.best = node.child[0];
-    node.hyoka = val;
+    node.hyoka = val.hyoka;
     node.kyokumensu = child.kyokumensu + 1;
     return node;
   }
@@ -528,7 +528,7 @@ function genandeval_shuffle(node, c, teban, depth)
     child.hyoka = val.hyoka;
     node.child = [child];
     node.best = node.child[0];
-    node.hyoka = val;
+    node.hyoka = val.hyoka;
     node.kyokumensu = child.kyokumensu + 1;
     return node;
   }
