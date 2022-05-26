@@ -1004,3 +1004,13 @@ function sendsynceval()
 window.addEventListener('load', function(){
   sendsynceval();
 }, false);
+
+function applyrfen()
+{
+  let rfen = hintt.value;
+  let c = fromRFEN(rfen);
+  if (c.length != cells.length) return;
+  for (let i = 0 ; i < CELL2D ; ++i)
+    cells[i] = c[i];
+  draw();
+}
