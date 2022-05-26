@@ -63,13 +63,13 @@ class BrowserTest < BrowserTestAbstract
       sleep 1
       kifu = getkifu
 
-      break if kifu.include?('の勝ち')
-      break if kifu.include?('引き分け')
-
       if old != kifu
         print kifu[old.size, kifu.size]
         old = kifu
       end
+
+      break if kifu.include?('の勝ち')
+      break if kifu.include?('引き分け')
     end
 
     puts "button read"
@@ -84,7 +84,7 @@ class BrowserTest < BrowserTestAbstract
     puts path
     kifu2file(path, kifu)
     # puts "result:\n#{kifu}\n"
-    puts File.read(path)
+    # puts File.read(path)
   end
 
   def simpleaccess
