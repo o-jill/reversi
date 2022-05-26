@@ -52,7 +52,7 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def playr(idx)
-    puts "starting gmae #{idx}"
+    puts "starting game #{idx}"
     clickbtn(:id, 'btninit')
     sleep 0.5
 
