@@ -52,35 +52,27 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def playr(idx)
+    puts "starting gmae #{idx}"
     clickbtn(:id, 'btninit')
     sleep 0.5
 
     clickbtn(:id, 'btncommvr')
+    old = ""
     kifu = ""
     loop do
-      sleep 0.5
+      sleep 1
       kifu = getkifu
 
       break if kifu.include?('の勝ち')
       break if kifu.include?('引き分け')
+
+      if old != kifu
+        print kifu[old.size, kifu.size]
+        old = kifu
+      end
     end
-    # old = ""
-    # kifu = ""
-    # loop do
-    #   clickbtn(:id, 'btncommv')
 
-    #   loop do
-    #     sleep 0.5
-    #     kifu = getkifu
-    #     break if old != kifu
-    #   end
-
-    #   break if kifu.include?('の勝ち')
-    #   break if kifu.include?('引き分け')
-
-    #   old = kifu
-    # end
-
+    puts "button read"
     clickbtn(:id, 'btnread')
     loop do
       elem = driver.find_element(:id, 'btnread')
@@ -89,6 +81,7 @@ class BrowserTest < BrowserTestAbstract
     end
 
     path = format("kifu/kifu%09d.txt", idx)
+    puts path
     kifu2file(path, kifu)
     # puts "result:\n#{kifu}\n"
     puts File.read(path)
