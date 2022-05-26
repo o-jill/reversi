@@ -547,6 +547,15 @@ function genandeval_shuffle(node, c, teban, depth)
     return null;
   }
   if (child.length == 0) {  // 指し手無し ≒ パス
+    if (brothermode == BM_TWINS) {
+      oBrother = null;
+      // ask brother think about half of children.
+      this.postMessage(
+        {
+          cmd: 'partial', child: [],
+          cells: c, teban: teban, depth: depth
+        });
+    }
     child = { x: -1, y: -1, hyoka: null, child: null, best: null };
     let val = genandeval(child, c, -teban, depth - 1);
 
