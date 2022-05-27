@@ -706,8 +706,8 @@ function mergeResult(ybr)
   oBrother.kyokumensu += ybr.kyokumensu;
 
   if (yhyoka != null && ohyoka * teban < yhyoka * teban) {
-    oBrother.hyoka = ybr.best;
-    oBrother.yhyoka = yhyoka;
+    oBrother.best = ybr.best;
+    oBrother.hyoka = yhyoka;
   }
   let duration = new Date().getTime() - starttime;
   // console.debug({ odu: oBrother.duration, ndu: duration });
