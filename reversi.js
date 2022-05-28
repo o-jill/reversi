@@ -709,7 +709,7 @@ workerthread.onmessage = function(e)
       syncevaltbl(e.data.evaltbl);
     } else {
       let et = e.data.evaltbl;
-      hintt.value += '\n' + et.join(',');
+      hintt.value = et.join(',');
     }
     return;
   }
