@@ -161,7 +161,7 @@ class BrowserTest < BrowserTestAbstract
     sleep 0.5
     et = driver.find_element(:id, 'hintt').attribute(:value)
     puts "evaltbl:#{et}"
-    File.open("newevaltable.txt", "w") do |f|
+    File.open("kifu/newevaltable.csv", "w") do |f|
       f.write(et)
     end
   end
