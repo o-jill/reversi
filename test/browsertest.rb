@@ -142,15 +142,18 @@ class BrowserTest < BrowserTestAbstract
     # enumerate txt in kifu dir.
     list = enumeratekifu
 
-    list.each do |path|
-      puts "[#{path}]"
-      loadkifu(path)
+    100.times do |it|
+      puts "#{it}/100 ..."
+      list.shuffle.each do |path|
+        puts "[#{path}]"
+        loadkifu(path)
 
-      clickbtn(:id, 'btnread')
-      loop do
-        elem = driver.find_element(:id, 'btnread')
-        break if elem.enabled?
-        sleep 0.5
+        clickbtn(:id, 'btnread')
+        loop do
+          elem = driver.find_element(:id, 'btnread')
+          break if elem.enabled?
+          sleep 0.5
+        end
       end
     end
   end
