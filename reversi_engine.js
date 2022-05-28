@@ -679,7 +679,7 @@ function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0,best: null};
   hinto = genandeval_shuffle(hinto, c, teban, n);
-  console.log("best:%f, %d nodes.", hinto.hyoka, hinto.kyokumensu)
+  // console.log("best:%f, %d nodes.", hinto.hyoka, hinto.kyokumensu)
   return [hinto.best, hinto.kyokumensu, hinto.hyoka];
 }
 
@@ -712,6 +712,7 @@ function mergeResult(ybr)
   let duration = new Date().getTime() - starttime;
   // console.debug({ odu: oBrother.duration, ndu: duration });
   oBrother.duration = duration;
+  console.log("merged best:%f, %d nodes.", oBrother.hyoka, oBrother.kyokumensu)
   this.postMessage(oBrother);
 }
 
