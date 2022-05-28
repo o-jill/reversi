@@ -1007,10 +1007,24 @@ window.addEventListener('load', function(){
 
 function applyrfen()
 {
+  if (enableclick == false)
+    return;
+
+  teban = SENTE;
+
+  tesuu = 1;
+  pass = 0;
+
+  kifu.value = "";
+  inp.value = "";
+
   let rfen = hintt.value;
   let c = fromRFEN(rfen);
+
   if (c.length != cells.length) return;
+
   for (let i = 0 ; i < CELL2D ; ++i)
     cells[i] = c[i];
+
   draw();
 }
