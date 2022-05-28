@@ -156,6 +156,14 @@ class BrowserTest < BrowserTestAbstract
         end
       end
     end
+
+    clickbtn('btnevaltbl')
+    sleep 0.5
+    et = driver.find_element(:id, 'hintt').attribute(:value)
+    puts "evaltbl:#{et}"
+    File.open("newevaltable.txt", "w") do |f|
+      f.write(et)
+    end
   end
 
   def run
