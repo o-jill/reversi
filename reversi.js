@@ -993,6 +993,7 @@ function updateevaltbl()
   btnet.disables = true;
   let et = hintt.value.split(',');
   workerthread.postMessage({ cmd: 'newevaltbl', evaltbl: et });
+  workerthread2.postMessage({ cmd: 'newevaltbl', evaltbl: et });
 }
 
 function sendsynceval()

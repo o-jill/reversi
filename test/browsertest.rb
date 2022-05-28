@@ -87,8 +87,31 @@ class BrowserTest < BrowserTestAbstract
     # puts File.read(path)
   end
 
+  # load evaltable from test/evaltable.txt.
+  def load_evaltable
+    # clickbtn(:id, 'btnevaltbl')
+    # sleep 1
+    # hintt = driver.find_element(:id, 'hintt')
+    # puts "-----\n#{hintt.attribute(:value)}\n-----\n"
+
+    # hintt.clear()
+    # File.read('./test/evaltable.txt').each_char do |c|
+    #   hintt.send_keys(c)
+    # end
+    # sleep 5
+    jscmd = format("hintt.value=\"#{File.read('./test/evaltable.txt')}\";")
+    @driver.execute_script(jscmd)
+    # sleep 5
+    clickbtn(:id, 'btnupdate')
+    sleep 1
+    clickbtn(:id, 'btnevaltbl')
+    # puts "=====\n#{hintt.attribute(:value)}\n=====\n"
+  end
+
   def simpleaccess
     simplecheck 'index.html'
+
+    load_evaltable
 
     clickbtn(:id, 'acmchk')
     clickbtn(:id, 'acmachk')
