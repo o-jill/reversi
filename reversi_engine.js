@@ -29,6 +29,17 @@ const BM_TWINS = 1;
 var brothermode = BM_TWINS;
 var oBrother = null;
 
+var route = [];
+function route_push(x, y)
+{
+  route.push(x + "" + y);
+}
+function route_pop(hyoka)
+{
+  console.log(route.join(",") + ":" + hyoka);
+  route.pop();
+}
+
 function count(c)
 {
   let sum = 0;
@@ -462,14 +473,17 @@ function genandeval(node, c, teban, depth)
 
   let child = genmove(c, teban);
   if (child == null) {  // no blank cells.
+    route_push('f', 'f');
     node.kyokumensu = 1;
     node.child = null;
     node.hyoka = count(c) * 200;
+    route_pop(node.hyoka);
     return node;
   }
   if (child.length == 0) {  // 指し手無し ≒ パス
     // debugcells(c, teban);
     child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    route_push('p', 's');
     let val = genandeval(child, c, -teban, depth - 1);
 
     child.hyoka = val.hyoka;
@@ -477,6 +491,7 @@ function genandeval(node, c, teban, depth)
     node.best = node.child[0];
     node.hyoka = val.hyoka;
     node.kyokumensu = child.kyokumensu + 1;
+    route_pop(val.hyoka);
     return node;
   }
   node.child = child;
@@ -557,9 +572,13 @@ function genandeval_shuffle(node, c, teban, depth)
         });
     }
     child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    route_push('p', 's');
     let val = genandeval(child, c, -teban, depth - 1);
 
     child.hyoka = val.hyoka;
+
+    route_pop(val.hyoka);
+
     node.child = [child];
     node.best = node.child[0];
     node.hyoka = val.hyoka;
@@ -593,9 +612,12 @@ function genandeval_shuffle(node, c, teban, depth)
     let y = child[i].y;
     celltmp = move(celltmp, x, y, teban);
 
+    route_push(x, y);
     let val =  genandeval(child[i], celltmp, -teban, depth-1);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
+
+    route_pop(val.hyoka);
 //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
 //              node.hyoka*teban, val, teban, val*teban, depth);
 //  console.dir(node);
@@ -644,9 +666,12 @@ function genandeval_partial(child, c, teban, depth) {
     let y = child[i].y;
     celltmp = move(celltmp, x, y, teban);
 
+    route_push(x, y);
     let val = genandeval(child[i], celltmp, -teban, depth - 1);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
+
+    route_pop(val.hyoka);
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
