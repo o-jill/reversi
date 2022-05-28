@@ -36,7 +36,7 @@ function route_push(x, y)
 }
 function route_pop(hyoka)
 {
-  console.log(route.join(",") + ":" + hyoka);
+  // console.log(route.join(",") + ":" + hyoka);
   route.pop();
 }
 
