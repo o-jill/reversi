@@ -506,14 +506,18 @@ function genandeval(node, c, teban, depth)
     let y = child[i].y;
     celltmp = move(celltmp, x, y, teban);
 
+    route_push(x, y);
+
     let val =  genandeval(child[i], celltmp, -teban, depth-1);
     child[i].hyoka = val.hyoka;
+
+    route_pop(val.hyoka);
     sum += child[i].kyokumensu;
 // console.log("c%d:%d,%d:%d:%d",depth,x,y,teban,val);
 // console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
 //             node.hyoka*teban, val, teban, val*teban, depth);
 // console.dir(node);
-    if (node.best == null || node.hyoka*teban < val*teban) {
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
       //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
       //   teban, node.hyoka, val, depth);
@@ -621,7 +625,7 @@ function genandeval_shuffle(node, c, teban, depth)
 //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
 //              node.hyoka*teban, val, teban, val*teban, depth);
 //  console.dir(node);
-    if (node.best == null || node.hyoka*teban < val*teban) {
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
       //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
@@ -675,7 +679,7 @@ function genandeval_partial(child, c, teban, depth) {
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
-    if (node.best == null || node.hyoka * teban < val * teban) {
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
       //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
       node.best = node.child[i];
@@ -731,13 +735,15 @@ function mergeResult(ybr)
   oBrother.kyokumensu += ybr.kyokumensu;
 
   if (yhyoka != null && ohyoka * teban < yhyoka * teban) {
-    oBrother.best = ybr.best;
+    oBrother.hinto = ybr.best;
     oBrother.hyoka = yhyoka;
   }
   let duration = new Date().getTime() - starttime;
   // console.debug({ odu: oBrother.duration, ndu: duration });
   oBrother.duration = duration;
-  console.log("merged best:%f, %d nodes.", oBrother.hyoka, oBrother.kyokumensu)
+  let x = oBrother.hinto.x;
+  let y = oBrother.hinto.y;
+  console.log("merged best:%f (%d, %d), %d nodes.", oBrother.hyoka, x, y, oBrother.kyokumensu)
   this.postMessage(oBrother);
 }
 
