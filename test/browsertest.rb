@@ -14,10 +14,14 @@ class BrowserTest < BrowserTestAbstract
 
   attr_reader :gameurl
 
-  TESTTBL = %w[simpleaccess].freeze
+  TESTTBL = %w[simpleaccess learning].freeze
 
   def getkifu
     driver.find_element(:id, 'kifu').attribute(:value)
+  end
+
+  def loadkifu(path)
+    driver.execute_script("kifu.value=arguments[0];", File.read(path))
   end
 
   def kifu2file(path, txt = nil)
@@ -118,6 +122,36 @@ class BrowserTest < BrowserTestAbstract
 
     1.times do |idx|
       playr idx
+    end
+  end
+
+  def enumeratekifu
+    files = Dir.children('kifu').map do |path|
+      "./kifu/#{path}"
+    end
+    files.select do |path|
+      /kifu\d+\.txt/ =~ path
+    end
+  end
+
+  def learning
+    simplecheck 'index.html'
+
+    load_evaltable
+
+    # enumerate txt in kifu dir.
+    list = enumeratekifu
+
+    list.each do |path|
+      puts "[#{path}]"
+      loadkifu(path)
+
+      clickbtn(:id, 'btnread')
+      loop do
+        elem = driver.find_element(:id, 'btnread')
+        break if elem.enabled?
+        sleep 0.5
+      end
     end
   end
 
