@@ -100,7 +100,7 @@ class BrowserTest < BrowserTestAbstract
     # end
     # sleep 5
     jscmd = format("hintt.value=\"#{File.read('./test/evaltable.txt')}\";")
-    @driver.execute_script(jscmd)
+    driver.execute_script(jscmd)
     # sleep 5
     clickbtn(:id, 'btnupdate')
     sleep 1
