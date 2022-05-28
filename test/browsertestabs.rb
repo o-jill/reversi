@@ -7,14 +7,48 @@ require './test/testresult.rb'
 
 # base for testing pages on a browser
 class BrowserTestAbstract
-  def initialize
-    # Firefox用のドライバを使う
-    @driver = Selenium::WebDriver.for :firefox
+  def initialize(browser = '')
     @wait = Selenium::WebDriver::Wait.new(timeout: 10)
+
+    if browser == 'chrome' then
+      usefirefox
+      @res = Result.new(driver)
+      return
+    end
+
+    if browser == 'firefox' then
+      usefirefox
+      @res = Result.new(driver)
+      return
+    end
+
+    findbrowser
     @res = Result.new(driver)
   end
 
   attr_reader :driver, :res
+
+  def findbrowser
+    begin
+      usechrome
+    rescue
+      begin
+        usefirefox
+      rescue
+        puts "no web drivers..."
+      end
+    end
+  end
+
+  # Chrome用のドライバを使う
+  def usechrome
+    @driver = Selenium::WebDriver.for :chrome
+  end
+
+  # Firefox用のドライバを使う
+  def usefirefox
+    @driver = Selenium::WebDriver.for :firefox
+  end
 
   # ok, ngのカウントをゼロにする
   def reset
