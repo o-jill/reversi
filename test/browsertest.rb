@@ -72,13 +72,13 @@ class BrowserTest < BrowserTestAbstract
       break if kifu.include?('引き分け')
     end
 
-    puts "button read"
-    clickbtn(:id, 'btnread')
-    loop do
-      elem = driver.find_element(:id, 'btnread')
-      break if elem.enabled?
-      sleep 0.5
-    end
+    # puts "button read"
+    # clickbtn(:id, 'btnread')
+    # loop do
+    #   elem = driver.find_element(:id, 'btnread')
+    #   break if elem.enabled?
+    #   sleep 0.5
+    # end
 
     path = format("kifu/kifu%09d.txt", idx)
     puts path
