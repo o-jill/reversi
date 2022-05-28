@@ -93,7 +93,7 @@ class BrowserTest < BrowserTestAbstract
     clickbtn(:id, 'acmchk')
     clickbtn(:id, 'acmachk')
 
-    3.times do |idx|
+    1.times do |idx|
       playr idx
     end
   end
