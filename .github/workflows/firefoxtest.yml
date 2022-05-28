@@ -31,6 +31,12 @@ jobs:
 #          - /dev/shm:/dev/shm
     steps:
     - uses: actions/checkout@v2
+    - name: Set current datetime as env variable
+      env:
+        TZ: 'Asia/Tokyo' # タイムゾーン指定
+      run: echo "CURRENT_DATETIME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+    - name: Show current datetime
+      run: echo ${{ env.CURRENT_DATETIME }}
     - name: 'Setup Firefox and geckodriver'
 #     runs:
 #       using: "composite"
@@ -77,7 +83,7 @@ jobs:
     - name: save taikyoku logs
       uses: actions/upload-artifact@v2
       with:
-        name: taikyoku_firefox${{ matrix.ruby-version }}-kifu${{ matrix.kifu }}
+        name: taikyoku_firefox${{ matrix.ruby-version }}-kifu${{ matrix.kifu }}${{ env.CURRENT_DATETIME }}
         path: |
            kifu
 #          config
