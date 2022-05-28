@@ -70,7 +70,7 @@ jobs:
       run: Xvfb :99 &
     - name: launch web server
       run: |
-        ruby ./test/webserver.rb 2>log/web.log &
+        ruby ./test/webserver.rb 2>web.log &
         sleep 3 # give some software a moment to start
     - name: Run tests
       continue-on-error: true # とにかくログを保存するとこまで行きたい
