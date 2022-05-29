@@ -15,6 +15,17 @@ class BrowserTest < BrowserTestAbstract
   attr_reader :gameurl
 
   TESTTBL = %w[simpleaccess learning].freeze
+  # TESTTBL = %w[learning].freeze
+
+  RFENTBL = [
+    '8/8/8/3Aa3/3aA3/8/8/8'   ,  # init
+    '8/8/8/2c3/2C3/8/8/8'     ,  # 35 34
+    '8/8/8/3Aa3/2AaA3/2a5/8/8',  # 35 36
+    '8/8/8/3Aa3/2Ba3/4a3/8/8' ,  # 35 56
+    '8/8/8/2c3/3B3/3A4/8/8'   ,  # 46 36
+    '8/8/8/3Aa3/3aA3/2aA4/8/8',  # 46 36
+    '8/8/8/3Aa3/3Aa3/3Aa3/8/8'   # 46 56
+  ]
 
   def getkifu
     driver.find_element(:id, 'kifu').attribute(:value)
@@ -26,6 +37,14 @@ class BrowserTest < BrowserTestAbstract
 
   def kifu2file(path, txt = nil)
     File.write(path, txt || getkifu)
+  end
+
+  def loadrfen
+    jscmd = format("hintt.value=\"#{RFENTBL.sample}\";")
+    driver.execute_script(jscmd)
+    # sleep 5
+    clickbtn(:id, 'btnfromrfen')
+    sleep 0.5
   end
 
   def play(idx)
@@ -57,8 +76,9 @@ class BrowserTest < BrowserTestAbstract
 
   def playr(idx)
     puts "starting game #{idx}"
-    clickbtn(:id, 'btninit')
-    sleep 0.5
+    # clickbtn(:id, 'btninit')
+    # sleep 0.5
+    loadrfen
 
     clickbtn(:id, 'btncommvr')
     old = ""
@@ -91,6 +111,17 @@ class BrowserTest < BrowserTestAbstract
     # puts File.read(path)
   end
 
+  def readevaltbl(path)
+    File.open('./test/evaltable.txt', 'r') do |f|
+      l = f.readline
+      l.chomp!
+      continue if l.empty?
+      continue if l.start_with?('#')
+      return l
+    end
+    ''
+  end
+
   # load evaltable from test/evaltable.txt.
   def load_evaltable
     # clickbtn(:id, 'btnevaltbl')
@@ -103,7 +134,7 @@ class BrowserTest < BrowserTestAbstract
     #   hintt.send_keys(c)
     # end
     # sleep 5
-    jscmd = format("hintt.value=\"#{File.read('./test/evaltable.txt')}\";")
+    jscmd = format("hintt.value=\"#{readevaltbl('./test/evaltable.txt')}\";")
     driver.execute_script(jscmd)
     # sleep 5
     clickbtn(:id, 'btnupdate')
