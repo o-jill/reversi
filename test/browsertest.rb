@@ -157,7 +157,7 @@ class BrowserTest < BrowserTestAbstract
       end
     end
 
-    clickbtn('btnevaltbl')
+    clickbtn(:id, 'btnevaltbl')
     sleep 0.5
     et = driver.find_element(:id, 'hintt').attribute(:value)
     puts "evaltbl:#{et}"
