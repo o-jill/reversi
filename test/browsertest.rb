@@ -157,7 +157,7 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def enumeratekifu
-    files = Dir.children('kifu').map do |path|
+    files = Dir.entries('kifu').map do |path|
       "./kifu/#{path}"
     end
     files.select do |path|
