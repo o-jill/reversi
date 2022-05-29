@@ -5,6 +5,8 @@ require 'selenium-webdriver'
 
 require './test/browsertestabs.rb'
 require './test/testresult.rb'
+require './test/initialpos.rb'
+
 
 # test pages on a browser
 class BrowserTest < BrowserTestAbstract
@@ -16,16 +18,6 @@ class BrowserTest < BrowserTestAbstract
 
   TESTTBL = %w[simpleaccess learning].freeze
   # TESTTBL = %w[learning].freeze
-
-  RFENTBL = [
-    '8/8/8/3Aa3/3aA3/8/8/8'   ,  # init
-    '8/8/8/2c3/2C3/8/8/8'     ,  # 35 34
-    '8/8/8/3Aa3/2AaA3/2a5/8/8',  # 35 36
-    '8/8/8/3Aa3/2Ba3/4a3/8/8' ,  # 35 56
-    '8/8/8/2c3/3B3/3A4/8/8'   ,  # 46 36
-    '8/8/8/3Aa3/3aA3/2aA4/8/8',  # 46 36
-    '8/8/8/3Aa3/3Aa3/3Aa3/8/8'   # 46 56
-  ]
 
   def getkifu
     driver.find_element(:id, 'kifu').attribute(:value)
