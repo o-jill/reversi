@@ -890,7 +890,7 @@ function readkifu()
     return;
   }
   ntrain = rfen.length;
-  teban = SENTE;
+  teban = GOTE;
   for (let i = 0 ; i < rfen.length ; ++i) {
     if (isNaN(moves[i])) {
       --ntrain;
