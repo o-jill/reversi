@@ -31,8 +31,8 @@ class BrowserTest < BrowserTestAbstract
     File.write(path, txt || getkifu)
   end
 
-  def loadrfen
-    jscmd = format("hintt.value=\"#{RFENTBL.sample}\";")
+  def loadrfen(rfen)
+    jscmd = format("hintt.value=\"#{rfen}\";")
     driver.execute_script(jscmd)
     # sleep 5
     clickbtn(:id, 'btnfromrfen')
@@ -66,11 +66,11 @@ class BrowserTest < BrowserTestAbstract
     puts File.read(path)
   end
 
-  def playr(idx)
+  def playr(idx, rfen)
     puts "starting game #{idx}"
     # clickbtn(:id, 'btninit')
     # sleep 0.5
-    loadrfen
+    loadrfen(rfen)
 
     clickbtn(:id, 'btncommvr')
     old = ""
@@ -144,8 +144,11 @@ class BrowserTest < BrowserTestAbstract
     clickbtn(:id, 'acmachk')
 
     1.times do |idx|
-      playr idx
+      playr(idx, RFENTBL[idx])
     end
+    # RFENTBL.each_with_index do |rfen, idx|
+    #   playr(idx, rfen)
+    # end
   end
 
   def enumeratekifu
