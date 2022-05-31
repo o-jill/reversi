@@ -193,6 +193,8 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def run
+    starttime = Time.now
+    puts "Started on #{starttime}"
     TESTTBL.each do |test|
       unless methods(true).include?(test.to_sym)
         puts "unknown test name '#{test}'..."
@@ -202,6 +204,9 @@ class BrowserTest < BrowserTestAbstract
       method(test.to_sym).call
     end
 
+    finishtime = Time.now
+    puts "Finished on #{finishtime}"
+    puts "#{it took (finishtime - starttime)/3600.0} hours."
     # テストを終了する（ブラウザを終了させる）
     # driver.quit
   end
