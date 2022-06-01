@@ -358,7 +358,10 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         cells = move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0, toRFEN(cells));
+        kifu.value +=
+          movestr(
+            cells, cellx, celly, teban, tesuu,
+            0/* man */, 0, toRFEN(cells, -teban));
 
         ++tesuu;
         pass = 0;
@@ -386,13 +389,19 @@ function onClick(e)
           } else if (teban == GOTE) {
             teban = SENTE;
           }
-          kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0, toRFEN(cells));
+          kifu.value +=
+            movestr(
+              cells, -1, -1, teban, tesuu,
+              0/* man */, 0, toRFEN(cells, -teban));
         }
       }
     }
 
     if (bnextmove && teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0, toRFEN(cells));
+      kifu.value +=
+        movestr(
+          cells, -1, -1, teban, tesuu,
+          0, 0, toRFEN(cells, teban));
     }
     gotobottom(kifu);
     draw();
@@ -760,7 +769,10 @@ workerthread.onmessage = function(e)
     ++pass;
   }
 
-  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration, toRFEN(cells));
+  kifu.value +=
+    movestr(
+      cells, x, y, teban, tesuu, kyokumensu,
+      duration, toRFEN(cells, -teban));
 
   ++tesuu;
   // 手番変更
@@ -782,7 +794,10 @@ workerthread.onmessage = function(e)
     COMmoveR();
   } else {
     if (teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0, toRFEN(cells));
+      kifu.value +=
+        movestr(
+          cells, -1, -1, teban, tesuu,
+          0, 0, toRFEN(cells, teban));
     }
   }
   if (hinto != null) {
@@ -910,7 +925,7 @@ function readkifu()
 const BLACKN = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '*',];
 const WHITEN = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', '*',];
 
-function toRFEN(cells)
+function toRFEN(cells, teban)
 {
   let result = new Array(NUMCELL);
   for (let i = 0; i < NUMCELL; ++i) {
@@ -943,20 +958,37 @@ function toRFEN(cells)
     result[i] = line;
   }
 
-  return result.join('/');
+  let t = ' f';
+  if (teban == SENTE) {
+    t = ' b';
+  } else if (teban == GOTE) {
+    t = ' w';
+  // } else if (c == BLANK) {
+  }
+  return result.join('/') + t;
 }
 
 const NBLACK = "ABCDEFGH";
 const NWHITE = "abcdefgh";
-const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8";
+const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8 b";
 
 function fromRFEN(rfen)
 {
+  let [n, t] = rfen.split(' ');
+
+  if (t == 'b') {
+    teban = SENTE;
+  } else if (t == 'w') {
+    teban = GOTE;
+  } else {
+    teban = BLANK;
+  }
+
   let cells = new Array(CELL2D);
   let icell = 0;
 
-  for (let i = 0; i < rfen.length; ++i) {
-    let ch = rfen[i];
+  for (let i = 0; i < n.length; ++i) {
+    let ch = n[i];
     let j = NBLACK.indexOf(ch);
     if (j >= 0) {
       while( j >= 0 ) {
@@ -1011,7 +1043,7 @@ function applyrfen()
   if (enableclick == false)
     return;
 
-  teban = SENTE;
+  teban = BLANK;
 
   tesuu = 1;
   pass = 0;

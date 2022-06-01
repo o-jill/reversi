@@ -206,7 +206,7 @@ class BrowserTest < BrowserTestAbstract
 
     finishtime = Time.now
     puts "Finished on #{finishtime}"
-    puts "#{it took (finishtime - starttime)/3600.0} hours."
+    puts "it took #{(finishtime - starttime)/3600.0} hours."
     # テストを終了する（ブラウザを終了させる）
     # driver.quit
   end
