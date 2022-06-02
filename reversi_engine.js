@@ -25,6 +25,9 @@ const CELL2D = NUMCELL * NUMCELL;
 const BM_SINGLE = 0;
 const BM_TWINS = 1;
 
+const ALPHA_INIT = -20000;
+const BETA_INIT = 20000;
+
 // var brothermode = BM_SINGLE;
 var brothermode = BM_TWINS;
 var oBrother = null;
@@ -462,12 +465,11 @@ function debugcells(c, teban)
 }
 
 /** 読みと指手の生成 */
-function genandeval(node, c, teban, depth)
-{
+function genandeval(node, c, teban, depth) {
   if (depth == 0) {
     node.kyokumensu = 1;
     node.child = null;
-    return {hyoka: evaluate2(c, teban)};
+    return { hyoka: evaluate2(c, teban) };
     // return evaluate(c);
   }
 
@@ -497,6 +499,85 @@ function genandeval(node, c, teban, depth)
   node.child = child;
 
   let celltmp = new Array(CELL2D);
+  let sum = 0;
+  for (let i = 0; i < node.child.length; ++i) {
+    for (let j = 0; j < CELL2D; ++j) {
+      celltmp[j] = c[j];
+    }
+    let x = child[i].x;
+    let y = child[i].y;
+    celltmp = move(celltmp, x, y, teban);
+
+    route_push(x, y);
+
+    let val = genandeval(child[i], celltmp, -teban, depth - 1);
+    child[i].hyoka = val.hyoka;
+
+    route_pop(val.hyoka);
+    sum += child[i].kyokumensu;
+    // console.log("c%d:%d,%d:%d:%d",depth,x,y,teban,val);
+    // console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
+    //             node.hyoka*teban, val, teban, val*teban, depth);
+    // console.dir(node);
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
+      // if (node.best != null) console.log(
+      //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
+      //   teban, node.hyoka, val, depth);
+      node.best = node.child[i];
+      node.hyoka = val.hyoka;
+      //  console.log("updated!")
+    } else {
+      // メモリ解放のつもり
+      child[i] = null;
+      node.child[i] = null;
+    }
+  }
+
+  node.kyokumensu = sum;
+
+  return node;
+}
+
+/**
+ * 読みと指手の生成
+ *
+ * @note genandeval_alphabeta(node, c, teban, depth, ALPHA_INIT, BETA_INIT)
+ */
+function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
+{
+  if (depth == 0) {
+    node.kyokumensu = 1;
+    node.child = null;
+    return {hyoka: evaluate2(c, teban)};
+    // return evaluate(c);
+  }
+
+  let child = genmove(c, teban);
+  if (child == null) {  // no blank cells.
+    route_push('f', 'f');
+    node.kyokumensu = 1;
+    node.child = null;
+    node.hyoka = count(c) * 200;
+    route_pop(node.hyoka);
+    return node;
+  }
+  if (child.length == 0) {  // 指し手無し ≒ パス
+    // debugcells(c, teban);
+    child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    route_push('p', 's');
+    let val = genandeval_alphabeta(child, c, -teban, depth - 1, -beta, -alpha);
+
+    child.hyoka = val.hyoka;
+    node.child = [child];
+    node.best = node.child[0];
+    node.hyoka = val.hyoka;
+    node.kyokumensu = child.kyokumensu + 1;
+    route_pop(val.hyoka);
+    return node;
+  }
+  node.child = child;
+
+  let celltmp = new Array(CELL2D);
   let sum  = 0;
   for (let i = 0 ; i < node.child.length ; ++i) {
     for (let j = 0 ; j < CELL2D ; ++j) {
@@ -508,7 +589,8 @@ function genandeval(node, c, teban, depth)
 
     route_push(x, y);
 
-    let val =  genandeval(child[i], celltmp, -teban, depth-1);
+    let val = genandeval_alphabeta(
+      child[i], celltmp, -teban, depth - 1, -beta, -alpha);
     child[i].hyoka = val.hyoka;
 
     route_pop(val.hyoka);
@@ -517,6 +599,10 @@ function genandeval(node, c, teban, depth)
 // console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
 //             node.hyoka*teban, val, teban, val*teban, depth);
 // console.dir(node);
+
+    // update alpha
+    if (alpha < val.hyoka) alpha = val.hyoka;
+
     if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
       //  "teban:%d, node.hyoka: %d, val:%d @depth:%d",
@@ -524,6 +610,9 @@ function genandeval(node, c, teban, depth)
       node.best = node.child[i];
       node.hyoka = val.hyoka;
 //  console.log("updated!")
+    } else if (alpha >= beta) {  // cut
+      // need freeing memory??
+      break;
     } else {
       // メモリ解放のつもり
       child[i] = null;
@@ -650,6 +739,106 @@ function genandeval_shuffle(node, c, teban, depth)
 }
 
 /** 読みと指手の生成 */
+function genandeval_shuffle_ab(node, c, teban, depth) {
+  /* if (depth == 0) {
+    node.kyokumensu = 1;
+    node.child = null;
+    return evaluate(c);
+  }*/
+  // console.info('genandeval');
+  let child = genmove(c, teban);
+  if (child == null) {  // no blank cells.
+    return null;
+  }
+  if (child.length == 0) {  // 指し手無し ≒ パス
+    if (brothermode == BM_TWINS) {
+      oBrother = null;
+      // ask brother think about half of children.
+      this.postMessage(
+        {
+          cmd: 'partial', child: [],
+          cells: c, teban: teban, depth: depth
+        });
+    }
+    child = { x: -1, y: -1, hyoka: null, child: null, best: null };
+    route_push('p', 's');
+    let val = genandeval_alphabeta(
+      child, c, -teban, depth - 1, ALPHA_INIT, BETA_INIT);
+
+    child.hyoka = val.hyoka;
+
+    route_pop(val.hyoka);
+
+    node.child = [child];
+    node.best = node.child[0];
+    node.hyoka = val.hyoka;
+    node.kyokumensu = child.kyokumensu + 1;
+    return node;
+  }
+  // shuffle
+  child = shuffle(child);
+
+  if (brothermode == BM_TWINS) {
+    oBrother = null;
+    // ask brother think about half of children.
+    this.postMessage(
+      {
+        cmd: 'partial_ab', child: child.slice(0, child.length / 2),
+        cells: c, teban: teban, depth: depth
+      });
+
+    child = child.slice(child.length / 2);
+  }
+  node.child = child;
+
+  // let points = new Array(node.child.length);
+  let celltmp = new Array(CELL2D);
+  let sum = 0;
+  let alpha = ALPHA_INIT;
+  for (let i = 0; i < node.child.length; ++i) {
+    for (let j = 0; j < CELL2D; ++j) {
+      celltmp[j] = c[j];
+    }
+    let x = child[i].x;
+    let y = child[i].y;
+    celltmp = move(celltmp, x, y, teban);
+
+    route_push(x, y);
+    let val = genandeval_alphabeta(
+      child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+    child[i].hyoka = val.hyoka;
+    sum += child[i].kyokumensu;
+
+    route_pop(val.hyoka);
+    if (alpha < val.hyoka) alpha = val.hyoka;
+    //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
+    //              node.hyoka*teban, val, teban, val*teban, depth);
+    //  console.dir(node);
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
+      // if (node.best != null) console.log(
+      //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
+      node.best = node.child[i];
+      node.hyoka = val.hyoka;  // node.child[i].hyoka;  // node.best.hyoka;
+      // console.info("updated!%d,%d:%d:%d",
+      //              node.best.x, node.best.y, teban, node.hyoka);
+      // console.log("updated!")
+    } else {
+      // メモリ解放のつもり
+      child[i] = null;
+      node.child[i] = null;
+      // console.log("%d,%d:%d:%d", x, y, teban, val);
+    }
+    // points[i] = val;
+  }
+
+  node.kyokumensu = sum;
+
+  // console.log("best %d,%d:%d:%d", node.best.x, node.best.y, teban, node.hyoka);
+
+  return node;
+}
+
+/** 読みと指手の生成 */
 function genandeval_partial(child, c, teban, depth) {
   let node = {
     x: -1, y: -1, hyoka: null, child: child, kyokumensu: 0, best: null
@@ -703,11 +892,75 @@ function genandeval_partial(child, c, teban, depth) {
   return node;
 }
 
+/** 読みと指手の生成 */
+function genandeval_partial_ab(child, c, teban, depth) {
+  let node = {
+    x: -1, y: -1, hyoka: null, child: child, kyokumensu: 0, best: null
+  };
+
+  if (child.length == 0) {  // 指し手無し
+    return node;
+  }
+
+  // let points = new Array(node.child.length);
+  let celltmp = new Array(CELL2D);
+  let sum = 0;
+  let alpha = ALPHA_INIT;
+  for (let i = 0; i < child.length; ++i) {
+    for (let j = 0; j < CELL2D; ++j) {
+      celltmp[j] = c[j];
+    }
+    let x = child[i].x;
+    let y = child[i].y;
+    celltmp = move(celltmp, x, y, teban);
+
+    route_push(x, y);
+    let val = genandeval_alphabeta(child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+    child[i].hyoka = val.hyoka;
+    sum += child[i].kyokumensu;
+
+    route_pop(val.hyoka);
+    if (alpha < val.hyoka) alpha = val.hyoka;
+    //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
+    //              node.hyoka*teban, val, teban, val*teban, depth);
+    //  console.dir(node);
+    if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
+      // if (node.best != null) console.log(
+      //     "teban:%d, node.hyoka: %d, val:%d", teban, node.hyoka, val);
+      node.best = node.child[i];
+      node.hyoka = val.hyoka;
+      // console.info("updated!%d,%d:%d:%d",
+      //              node.best.x, node.best.y, teban, node.hyoka);
+      // console.log("updated!")
+    } else {
+      // メモリ解放のつもり
+      child[i] = null;
+      node.child[i] = null;
+      // console.log("%d,%d:%d:%d", x, y, teban, val);
+    }
+    // points[i] = val;
+  }
+
+  node.kyokumensu = sum;
+
+  // console.log("best %d,%d:%d:%d", node.best.x, node.best.y, teban, node.hyoka);
+
+  return node;
+}
+
 /** N手読み */
 function hintNr(c, teban, n)
 {
   let hinto = {x: -1, y: -1, hyoka: null, child:null, kyokumensu:0,best: null};
   hinto = genandeval_shuffle(hinto, c, teban, n);
+  // console.log("best:%f, %d nodes.", hinto.hyoka, hinto.kyokumensu)
+  return [hinto.best, hinto.kyokumensu, hinto.hyoka];
+}
+
+/** N手読み alpha beta */
+function hintNr_ab(c, teban, n) {
+  let hinto = { x: -1, y: -1, hyoka: null, child: null, kyokumensu: 0, best: null };
+  hinto = genandeval_shuffle_ab(hinto, c, teban, n);
   // console.log("best:%f, %d nodes.", hinto.hyoka, hinto.kyokumensu)
   return [hinto.best, hinto.kyokumensu, hinto.hyoka];
 }
@@ -788,6 +1041,29 @@ onmessage = function (e) {
     }
     return;
   }
+  if (cmd == 'move_ab') {
+    let teban = e.data.teban;
+    let cells = e.data.cells;
+    let depth = e.data.depth;
+
+    starttime = new Date().getTime();
+
+    let [hinto, kyokumensu, hyoka] = hintNr_ab(cells, teban, depth);
+
+    let finishtime = new Date().getTime();
+    let duration = finishtime - starttime;
+
+    oBrother =
+    {
+      cmd: 'move_ab', hinto: hinto, kyokumensu: kyokumensu,
+      hyoka: hyoka, duration: duration, teban: teban
+    }
+    if (brothermode == BM_SINGLE) {
+      this.postMessage(oBrother);
+    } else {
+    }
+    return;
+  }
   if (cmd == 'evaltbl') {
     this.postMessage({ cmd: cmd, evaltbl: evaltbl2 });
     return;
@@ -809,8 +1085,36 @@ onmessage = function (e) {
     this.postMessage(res);
     return;
   }
+  /* think as brother */
+  if (cmd == 'think_ab') {
+    let child = e.data.child;
+    let depth = e.data.depth;
+    let teban = e.data.teban;
+    let cells = e.data.cells;
+    // think
+    // res = { x: -1, y: -1, hyoka: null, child: null, kyokumensu: 0, best: null };
+    let res = genandeval_partial_ab(child, cells, teban, depth);
+    if (res == null) {
+      res = { cmd: 'think_ab', best: null, hyoka: null, kyokumensu: 0 };
+    } else {
+      res.cmd = 'think_ab';
+    }
+    this.postMessage(res);
+    return;
+  }
   /* result from brother */
   if (cmd == 'partial') {
+    if (oBrother == null) {
+      yBrother = e.data;
+      this.setTimeout(waitoBrother, 100);
+      return;
+    }
+    // merge
+    mergeResult(e.data);
+    return;
+  }
+  /* result from brother */
+  if (cmd == 'partial_ab') {
     if (oBrother == null) {
       yBrother = e.data;
       this.setTimeout(waitoBrother, 100);

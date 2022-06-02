@@ -653,6 +653,20 @@ function COMmoveR()
   draw();
 }
 
+function COMmoveAB()
+{
+  if (enableclick == false)
+    return;
+
+  enableclick = false;
+  // prgs.style.display = 'none';
+  prgsm.style.display = 'block';
+
+  workerthread.postMessage({ cmd: 'move_ab', cells: cells, teban: teban, depth: 7 });
+
+  draw();
+}
+
 function init()
 {
   if (enableclick == false)
@@ -748,6 +762,20 @@ workerthread.onmessage = function(e)
     workerthread.postMessage(data);
     return;
   }
+  /* ask brother think */
+  if (cmd == 'partial_ab') {
+    let data = e.data;
+    data.cmd = 'think_ab';
+    workerthread2.postMessage(data);
+    return;
+  }
+  /* brother's thought */
+  if (cmd == 'think_ab') {
+    let data = e.data;
+    data.cmd = 'partial_ab';
+    workerthread.postMessage(data);
+    return;
+  }
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
   let duration = e.data.duration;
@@ -791,7 +819,10 @@ workerthread.onmessage = function(e)
   prgsm.style.display = 'none';
 
   if (atcommatchchk.checked == true && teban != BLANK) {
-    COMmoveR();
+    if (cmd == 'move')
+      COMmoveR();
+    else if (cmd == 'move_ab')
+      COMmoveAB();
   } else {
     if (teban == BLANK) {
       kifu.value +=
@@ -824,6 +855,12 @@ workerthread2.onmessage = function (e) {
   if (cmd == 'think') {
     let data = e.data;
     data.cmd = 'partial';
+    workerthread.postMessage(data);
+    return;
+  }
+  if (cmd == 'think_ab') {
+    let data = e.data;
+    data.cmd = 'partial_ab';
     workerthread.postMessage(data);
     return;
   }
