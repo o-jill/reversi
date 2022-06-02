@@ -923,7 +923,7 @@ function readkifu()
   for (let l of lines) {
     let elem = l.split(' ');
     moves.push(Number(elem[1]));
-    rfen.push(elem.slice(-1)[0]);
+    rfen.push(elem.slice(-2, -1).join(' '));
   }
   // console.log("moves:" + moves.join(' '));
 

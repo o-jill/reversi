@@ -170,6 +170,7 @@ class BrowserTest < BrowserTestAbstract
 
     100.times do |it|
       puts "#{it}/100 ..."
+      # list[0..1].each do |path|
       list.shuffle.each do |path|
         puts "[#{path}]"
         loadkifu(path)
