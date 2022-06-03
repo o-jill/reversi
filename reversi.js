@@ -9,6 +9,7 @@ const hintt = document.getElementById('hintt');
 const kifu = document.getElementById('kifu');
 const btnread = document.getElementById('btnread');
 const btnet = document.getElementById('btnupdate');
+const cmbmvtyp = document.getElementById('movetype');
 
 const cellsize = 50;
 const offset = 5;
@@ -407,8 +408,12 @@ function onClick(e)
     draw();
     keiseibar(cells);
     // if (teban != BLANK && autocommmove !== 0)
-    if (bnextmove && atcomchk.checked == true)
-      COMmoveR();
+    if (bnextmove && atcomchk.checked == true) {
+      if (cmbmvtyp.value == 'all')
+        COMmoveR();
+      else if (cmbmvtyp.value == 'alphabeta')
+        COMmoveAB();
+    }
   }
   // inp.value = evaluate(cells).toString(10) + "," + strteban();
 }
@@ -819,9 +824,9 @@ workerthread.onmessage = function(e)
   prgsm.style.display = 'none';
 
   if (atcommatchchk.checked == true && teban != BLANK) {
-    if (cmd == 'move')
+    if (cmbmvtyp.value == 'all')
       COMmoveR();
-    else if (cmd == 'move_ab')
+    else if (cmbmvtyp.value == 'alphabeta')
       COMmoveAB();
   } else {
     if (teban == BLANK) {
