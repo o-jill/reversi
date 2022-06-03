@@ -641,6 +641,35 @@ function shuffle(arr) {
   return arr;
 }
 
+function sort_child(arr, c, teban)
+{
+  if (arr.length <= 1) return arr;
+
+  let values = new Array(arr.length);
+  let celltmp = new Array(CELL2D);
+  for (let i = 0; i < arr.length; ++i) {
+    for (let j = 0; j < CELL2D; ++j) {
+      celltmp[j] = c[j];
+    }
+    let x = arr[i].x;
+    let y = arr[i].y;
+    celltmp = move(celltmp, x, y, teban);
+    values[i] = {val: evaluate2(celltmp, -teban), idx: i};
+  }
+
+
+  values.sort(
+    teban == GOTE
+      ? function(a, b) { return b.val - a.val; }
+      : function(a, b) { return a.val - b.val; });
+
+  let ret = Array(arr.length);
+  for (let i = 0; i < arr.length; ++i) {
+    ret[i] = arr[values[i].idx];
+  }
+  return ret;
+}
+
 /** 読みと指手の生成 */
 function genandeval_shuffle(node, c, teban, depth)
 {
@@ -776,7 +805,7 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
     return node;
   }
   // shuffle
-  child = shuffle(child);
+  // child = shuffle(child);
 
   if (brothermode == BM_TWINS) {
     oBrother = null;
@@ -789,6 +818,8 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
 
     child = child.slice(child.length / 2);
   }
+  // sort
+  child = sort_child(child, c, teban);
   node.child = child;
 
   // let points = new Array(node.child.length);
@@ -901,6 +932,8 @@ function genandeval_partial_ab(child, c, teban, depth) {
   if (child.length == 0) {  // 指し手無し
     return node;
   }
+  // sort
+  child = sort_child(child, c, teban);
 
   // let points = new Array(node.child.length);
   let celltmp = new Array(CELL2D);
