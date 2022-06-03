@@ -632,7 +632,7 @@ function checkResign()
 
 function COMmove()
 {
-  if (enableclick == false)
+  if (enableclick == false || teban == BLANK)
     return;
 
   enableclick = false;
@@ -646,7 +646,7 @@ function COMmove()
 
 function COMmoveR()
 {
-  if (enableclick == false)
+  if (enableclick == false || teban == BLANK)
     return;
 
   enableclick = false;
@@ -660,7 +660,7 @@ function COMmoveR()
 
 function COMmoveAB()
 {
-  if (enableclick == false)
+  if (enableclick == false || teban == BLANK)
     return;
 
   enableclick = false;
