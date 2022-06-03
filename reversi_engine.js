@@ -756,7 +756,7 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
       // ask brother think about half of children.
       this.postMessage(
         {
-          cmd: 'partial', child: [],
+          cmd: 'partial_ab', child: [],
           cells: c, teban: teban, depth: depth
         });
     }
