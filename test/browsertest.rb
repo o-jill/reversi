@@ -72,7 +72,7 @@ class BrowserTest < BrowserTestAbstract
     # sleep 0.5
     loadrfen(rfen)
 
-    clickbtn(:id, 'btncommvr')
+    clickbtn(:id, 'btncommvab')
     old = ""
     kifu = ""
     loop do
