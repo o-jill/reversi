@@ -1083,7 +1083,8 @@ function sendsynceval()
 }
 
 window.addEventListener('load', function(){
-  sendsynceval();
+  // sendsynceval();
+  get_evaltabletxt();
 }, false);
 
 function applyrfen()
@@ -1110,4 +1111,38 @@ function applyrfen()
   inp.value = "";
 
   draw();
+}
+
+function evaltabletxt_resp(status, resp)
+{
+  // var msg = document.getElementById('msg_l2f');
+  if (status === 0) {  // XHR 通信失敗
+    // msg.innerHTML += '[XHR 通信失敗]' + resp + '自動的にリロードします。';
+    // reloadlater();
+    return;
+  }
+  // XHR 通信成功
+  if ((200 <= status && status < 300) || status === 304) {
+    hintt.value = resp;
+    updateevaltbl();
+  } else {  // リクエスト失敗
+    window.alert('failed to get evaluation table.');
+  }
+  // reloadlater();
+}
+
+function get_evaltabletxt()
+{
+  var ajax = new XMLHttpRequest();
+  if (ajax === null)
+    return;
+  ajax.open('GET', './test/evaltable.txt');
+  ajax.send();
+  ajax.onreadystatechange = function () {
+    switch (ajax.readyState) {
+      case 4:
+        evaltabletxt_resp(ajax.status, ajax.responseText);
+        break;
+    }
+  };
 }
