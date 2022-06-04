@@ -18,6 +18,7 @@ const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
 const CELL2D = NUMCELL * NUMCELL;
+const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8 b";
 
 /* 1:黒,0:なし,-1:白*/
 var cells = [
@@ -29,7 +30,7 @@ var cells = [
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0];
-
+var rfen_cur = RFEN_START;
 var teban = SENTE;
 var autocommove = 0;
 var autocommatch = 0;
@@ -362,7 +363,8 @@ function onClick(e)
         kifu.value +=
           movestr(
             cells, cellx, celly, teban, tesuu,
-            0/* man */, 0, toRFEN(cells, -teban));
+            0/* man */, 0, rfen_cur);
+        rfen_cur = toRFEN(cells, -teban);
 
         ++tesuu;
         pass = 0;
@@ -393,7 +395,8 @@ function onClick(e)
           kifu.value +=
             movestr(
               cells, -1, -1, teban, tesuu,
-              0/* man */, 0, toRFEN(cells, -teban));
+              0/* man */, 0, rfen_cur);
+          rfen_cur = toRFEN(cells, -teban);
         }
       }
     }
@@ -402,7 +405,8 @@ function onClick(e)
       kifu.value +=
         movestr(
           cells, -1, -1, teban, tesuu,
-          0, 0, toRFEN(cells, teban));
+          0, 0, rfen_cur);
+      rfen_cur = toRFEN(cells, teban);
     }
     gotobottom(kifu);
     draw();
@@ -686,6 +690,7 @@ function init()
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0];
+  rfen_cur = RFEN_START;
 
   teban = SENTE;
 
@@ -805,7 +810,8 @@ workerthread.onmessage = function(e)
   kifu.value +=
     movestr(
       cells, x, y, teban, tesuu, kyokumensu,
-      duration, toRFEN(cells, -teban));
+      duration, rfen_cur);
+  rfen_cur = toRFEN(cells, -teban);
 
   ++tesuu;
   // 手番変更
@@ -833,7 +839,8 @@ workerthread.onmessage = function(e)
       kifu.value +=
         movestr(
           cells, -1, -1, teban, tesuu,
-          0, 0, toRFEN(cells, teban));
+          0, 0, rfen_cur);
+      rfen_cur = toRFEN(cells, teban);
     }
   }
   if (hinto != null) {
@@ -1012,7 +1019,6 @@ function toRFEN(cells, teban)
 
 const NBLACK = "ABCDEFGH";
 const NWHITE = "abcdefgh";
-const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8 b";
 
 function fromRFEN(rfen)
 {
@@ -1087,19 +1093,21 @@ function applyrfen()
 
   teban = BLANK;
 
-  tesuu = 1;
-  pass = 0;
-
-  kifu.value = "";
-  inp.value = "";
-
   let rfen = hintt.value;
   let c = fromRFEN(rfen);
 
   if (c.length != cells.length) return;
 
-  for (let i = 0 ; i < CELL2D ; ++i)
+  for (let i = 0; i < CELL2D; ++i)
     cells[i] = c[i];
+
+  rfen_cur = rfen;
+
+  tesuu = 1;
+  pass = 0;
+
+  kifu.value = "";
+  inp.value = "";
 
   draw();
 }
