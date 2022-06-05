@@ -126,13 +126,21 @@ class BrowserTest < BrowserTestAbstract
     #   hintt.send_keys(c)
     # end
     # sleep 5
-    jscmd = format("hintt.value=\"#{readevaltbl('./test/evaltable.txt')}\";")
-    driver.execute_script(jscmd)
-    # sleep 5
-    clickbtn(:id, 'btnupdate')
-    sleep 1
-    clickbtn(:id, 'btnevaltbl')
+    # jscmd = format("hintt.value=\"#{readevaltbl('./test/evaltable.txt')}\";")
+    # driver.execute_script(jscmd)
+    # # sleep 5
+    # clickbtn(:id, 'btnupdate')
+    # sleep 1
+    # clickbtn(:id, 'btnevaltbl')
     # puts "=====\n#{hintt.attribute(:value)}\n=====\n"
+
+    # wait loading evaltable.txt
+    loop do
+      sleep 0.5
+      ret = driver.execute_script('return initialized == true;');
+      p ret
+      break if ret != false
+    end
   end
 
   def simpleaccess
