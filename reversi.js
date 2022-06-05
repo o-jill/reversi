@@ -935,7 +935,8 @@ function readkifu()
   for (let l of lines) {
     let elem = l.split(' ');
     moves.push(Number(elem[1]));
-    rfen.push(elem.slice(-2, -1).join(' '));
+    let rfenlet = elem.slice(-2);
+    rfen.push(rfenlet.join(' '));
   }
   // console.log("moves:" + moves.join(' '));
 
@@ -955,8 +956,9 @@ function readkifu()
   }
   ntrain = rfen.length;
   teban = GOTE;
+  let rfenfmt = /([1-8A-Ha-h]+\/){7}[1-8A-Ha-h]+ [bw]/;
   for (let i = 0 ; i < rfen.length ; ++i) {
-    if (isNaN(moves[i])) {
+    if (isNaN(moves[i]) || !rfenfmt.test(rfen[i])) {
       --ntrain;
       continue;
     }
