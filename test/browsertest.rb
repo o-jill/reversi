@@ -151,12 +151,12 @@ class BrowserTest < BrowserTestAbstract
     clickbtn(:id, 'acmchk')
     clickbtn(:id, 'acmachk')
 
-    1.times do |idx|
-      playr(idx, RFENTBL[idx])
-    end
-    # RFENTBL.each_with_index do |rfen, idx|
-    #   playr(idx, rfen)
+    # 1.times do |idx|
+    #   playr(idx, RFENTBL[RFENTBL.size-1])
     # end
+    @rfentbl.each_with_index do |rfen, idx|
+      playr(idx, rfen)
+    end
   end
 
   def enumeratekifu
@@ -201,8 +201,18 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
-  def run
+  DIV_RFENTABLE = 9
+
+  def run(idx)
     starttime = Time.now
+
+    if idx >= 0 then
+      # @rfentbl = RFENTBL.slice(idx * DIV_RFENTABLE, 1)
+      @rfentbl = RFENTBL.slice(idx * DIV_RFENTABLE, DIV_RFENTABLE)
+    else
+      @rfentbl = RFENTBL
+    end
+
     puts "Started on #{starttime}"
     TESTTBL.each do |test|
       unless methods(true).include?(test.to_sym)
