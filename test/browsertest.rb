@@ -139,7 +139,7 @@ class BrowserTest < BrowserTestAbstract
       sleep 0.5
       ret = driver.execute_script('return initialized == true;');
       p ret
-      break if ret != false
+      break if ret
     end
   end
 
