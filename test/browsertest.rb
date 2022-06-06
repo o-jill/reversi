@@ -188,7 +188,7 @@ class BrowserTest < BrowserTestAbstract
         loop do
           elem = driver.find_element(:id, 'btnread')
           break if elem.enabled?
-          sleep 0.5
+          sleep 0.2
         end
       end
     end
