@@ -6,6 +6,7 @@ require 'selenium-webdriver'
 require './test/browsertestabs.rb'
 require './test/testresult.rb'
 require './test/initialpos.rb'
+require './test/extractrfen.rb'
 
 
 # test pages on a browser
@@ -231,6 +232,11 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def finalize(ret)
+    er = ExtractRfen.new(ARGV.grep(/^[^-]/)[0])
+    er.enumeratekifu.each do |path|
+      er.extract(path)
+    end
+
     # テストを終了する（ブラウザを終了させる）
     driver.quit
     exit(ret)
