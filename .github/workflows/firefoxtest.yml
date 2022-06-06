@@ -1,0 +1,97 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
+# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+
+name: Firefox test w/ ruby3
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ['3.0', '3.1']
+        kifu: ['-N5', '-N6', '-N7']
+#    services:
+#      selenium:
+#        image: selenium/standalone-chrome:3.141.59-vanadium
+#        ports:
+#          - 4444:4444
+#        volumes:
+#          - /dev/shm:/dev/shm
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set current datetime as env variable
+      env:
+        TZ: 'Asia/Tokyo' # タイムゾーン指定
+      run: echo "CURRENT_DATETIME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+    - name: Show current datetime
+      run: echo ${{ env.CURRENT_DATETIME }}
+    - name: 'Setup Firefox and geckodriver'
+#     runs:
+#       using: "composite"
+#       steps:
+      run: |
+        GECKODRIVER_URL=`curl -Ls -o /dev/null -w %{url_effective} https://github.com/mozilla/geckodriver/releases/latest`
+        GECKODRIVER_VERSION=`echo $GECKODRIVER_URL | sed 's#.*/##'`
+        export GECKODRIVER_DOWNLOAD="https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz"
+        curl -L -o geckodriver.tar.gz $GECKODRIVER_DOWNLOAD
+        gunzip -c geckodriver.tar.gz | tar xopf -
+        chmod +x geckodriver && sudo mv geckodriver /usr/local/bin
+        geckodriver --version
+#      shell: bash
+    - name: Set up Ruby
+    # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
+    # change this to (see https://github.com/ruby/setup-ruby#versioning):
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: ruby is here
+      run: |
+        which ruby
+        /usr/bin/env ruby --version
+    - name: Setup gems
+      run: |
+        gem install webrick -v1.7.0
+        gem install rubyzip -v2.3
+        gem install selenium-webdriver -v4.1
+        gem install unindent
+    - name: launch xvfb
+      run: Xvfb :99 &
+    - name: launch web server
+      run: |
+        ruby ./test/webserver.rb 2>web.log &
+        sleep 3 # give some software a moment to start
+    - name: Run tests
+      continue-on-error: true # とにかくログを保存するとこまで行きたい
+      id: usecase
+      run: |
+        ruby ./test/browsertestmain.rb ${{ matrix.kifu }}
+      env:
+        DISPLAY: :99
+    - name: save taikyoku logs
+      uses: actions/upload-artifact@v2
+      with:
+        name: taikyoku_firefox${{ matrix.ruby-version }}-kifu${{ matrix.kifu }}${{ env.CURRENT_DATETIME }}
+        path: |
+           kifu
+#          config
+#          db
+#          log
+#          taikyoku
+    - name: check error u
+      if: ${{ steps.usecase.outcome == 'failure' }}
+      run: |
+        echo ${{ steps.usecase.outcome }} == 'failure'
+        exit 1

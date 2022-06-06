@@ -7,6 +7,9 @@ var ctx = canvas.getContext('2d');
 const inp = document.getElementById('eval');
 const hintt = document.getElementById('hintt');
 const kifu = document.getElementById('kifu');
+const btnread = document.getElementById('btnread');
+const btnet = document.getElementById('btnupdate');
+const cmbmvtyp = document.getElementById('movetype');
 
 const cellsize = 50;
 const offset = 5;
@@ -14,6 +17,8 @@ const SENTE = 1;
 const GOTE = -1;
 const BLANK = 0;
 const NUMCELL = 8;
+const CELL2D = NUMCELL * NUMCELL;
+const RFEN_START = "8/8/8/3Aa3/3aA3/8/8/8 b";
 
 /* 1:黒,0:なし,-1:白*/
 var cells = [
@@ -25,7 +30,7 @@ var cells = [
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0];
-
+var rfen_cur = RFEN_START;
 var teban = SENTE;
 var autocommove = 0;
 var autocommatch = 0;
@@ -36,10 +41,13 @@ var tesuu = 1;
 var pass = 0;
 
 var enableclick = true;
-var workerthread = new Worker('reversi_engine.js');
+var workerthread = new Worker('reversi_engine.js?v005_1');
+var workerthread2 = new Worker('reversi_engine.js?v005_2');
 const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
+var ntrain = 0;
+var initialized = false;
 
 function draw()
 {
@@ -81,7 +89,7 @@ function draw()
 function count(c)
 {
   let sum = 0;
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     sum += c[i];
   }
   return sum;
@@ -267,7 +275,7 @@ function keiseibar(c)
   prgs.value = cnt+64;
 }
 
-function movestr(c, x, y, tb, ts, kms, tm)
+function movestr(c, x, y, tb, ts, kms, tm, rfen)
 {
   let str = ts.toString(10) + "手目 ";
   if (x < 0 || y < 0) {
@@ -283,7 +291,7 @@ function movestr(c, x, y, tb, ts, kms, tm)
   } else if (tb == GOTE) {
     str += " 白 ";
   } else {
-    str += " 終了";
+    str += " 終了 ";
   }
 
   let cnt = count(c);
@@ -301,6 +309,10 @@ function movestr(c, x, y, tb, ts, kms, tm)
   if (tm != null && tm >= 0) {
     str += " ";
     str += tm + "msec";
+  }
+
+  if (rfen) {
+    str += ' ' + rfen;
   }
 
   str += "\n";
@@ -348,21 +360,23 @@ function onClick(e)
       if (checkreverse(cells, cellx, celly, teban)) {
         cells = move(cells, cellx, celly, teban);
 
-        kifu.value += movestr(cells, cellx, celly, teban, tesuu, 0/* man */, 0);
+        kifu.value +=
+          movestr(
+            cells, cellx, celly, teban, tesuu,
+            0/* man */, 0, rfen_cur);
+        rfen_cur = toRFEN(cells, -teban);
 
         ++tesuu;
         pass = 0;
         bnextmove = true;
 
         // 手番変更
-        if (teban == SENTE) {
+        if (checkfinished(cells)) {
+          teban = BLANK;
+        } else if (teban == SENTE) {
           teban = GOTE;
         } else if (teban == GOTE) {
-          if (tesuu > NUMCELL*NUMCELL-4) {
-            teban = BLANK;
-          } else {
-            teban = SENTE;
-          }
+          teban = SENTE;
         }
       } else {
         let te = genmove(cells, teban);
@@ -371,33 +385,53 @@ function onClick(e)
           ++tesuu;
           ++pass;
           bnextmove = true;
-          if (pass >= 2) {
+          if (pass >= 2 || checkfinished(cells)) {
             teban = BLANK;
-          } else {
-            if (teban == SENTE) {
-              teban = GOTE;
-            } else if (teban == GOTE) {
-              teban = SENTE;
-            }
+          } else if (teban == SENTE) {
+            teban = GOTE;
+          } else if (teban == GOTE) {
+            teban = SENTE;
           }
-          kifu.value += movestr(cells, -1, -1, teban, tesuu, 0/* man */, 0);
+          kifu.value +=
+            movestr(
+              cells, -1, -1, teban, tesuu,
+              0/* man */, 0, rfen_cur);
+          rfen_cur = toRFEN(cells, -teban);
         }
       }
     }
 
     if (bnextmove && teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+      kifu.value +=
+        movestr(
+          cells, -1, -1, teban, tesuu,
+          0, 0, rfen_cur);
+      rfen_cur = toRFEN(cells, teban);
     }
     gotobottom(kifu);
     draw();
     keiseibar(cells);
     // if (teban != BLANK && autocommmove !== 0)
-    if (bnextmove && atcomchk.checked == true)
-      COMmoveR();
+    if (bnextmove && atcomchk.checked == true) {
+      if (cmbmvtyp.value == 'all')
+        COMmoveR();
+      else if (cmbmvtyp.value == 'alphabeta')
+        COMmoveAB();
+    }
   }
   // inp.value = evaluate(cells).toString(10) + "," + strteban();
 }
 
+/**
+ * @param cells 盤の情報
+ */
+function checkfinished(cells)
+{
+  for (let c of cells) {
+    if (c == BLANK) return false;
+  }
+  return true;
+}
 
 /**
  * @param c 盤の情報
@@ -581,7 +615,7 @@ function genmove(c, tbn)
 {
   let te = [];
 
-  for (let i = 0 ; i < NUMCELL*NUMCELL ; ++i) {
+  for (let i = 0 ; i < CELL2D ; ++i) {
     let val = c[i];
     if (val === BLANK) {
       let x, y;
@@ -602,28 +636,42 @@ function checkResign()
 
 function COMmove()
 {
-  if (enableclick == false)
+  if (enableclick == false || teban == BLANK)
     return;
 
   enableclick = false;
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:3});
+  workerthread.postMessage({cmd: 'move', cells:cells, teban:teban, depth:3});
 
   draw();
 }
 
 function COMmoveR()
 {
-  if (enableclick == false)
+  if (enableclick == false || teban == BLANK)
     return;
 
   enableclick = false;
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({cells:cells, teban:teban, depth:7});
+  workerthread.postMessage({cmd: 'move', cells:cells, teban:teban, depth:7});
+
+  draw();
+}
+
+function COMmoveAB()
+{
+  if (enableclick == false || teban == BLANK)
+    return;
+
+  enableclick = false;
+  // prgs.style.display = 'none';
+  prgsm.style.display = 'block';
+
+  workerthread.postMessage({ cmd: 'move_ab', cells: cells, teban: teban, depth: 10 });
 
   draw();
 }
@@ -642,6 +690,7 @@ function init()
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0];
+  rfen_cur = RFEN_START;
 
   teban = SENTE;
 
@@ -679,11 +728,68 @@ function hint()
   inp.value = txt;
 }
 
+function syncevaltbl(et)
+{
+  btnet.disables = true;  
+  workerthread2.postMessage({ cmd: 'newevaltbl', evaltbl: et });
+}
+
 workerthread.onmessage = function(e)
 {
+  let cmd = e.data.cmd;
+  if (cmd == 'evaltbl') {
+    if (!initialized) {
+      syncevaltbl(e.data.evaltbl);
+    } else {
+      let et = e.data.evaltbl;
+      hintt.value = et.join(',');
+    }
+    return;
+  }
+  if (cmd == 'train') {
+    --ntrain;
+    if (ntrain == 0) {
+      // window.alert('training done!');
+      btnread.disabled = false;
+    }
+    return;
+  }
+  if (cmd == 'newevaltbl') {
+    btnet.disables = false;
+    return;
+  }
+  /* ask brother think */
+  if (cmd == 'partial') {
+    let data = e.data;
+    data.cmd = 'think';
+    workerthread2.postMessage(data);
+    return;
+  }
+  /* brother's thought */
+  if (cmd == 'think') {
+    let data = e.data;
+    data.cmd = 'partial';
+    workerthread.postMessage(data);
+    return;
+  }
+  /* ask brother think */
+  if (cmd == 'partial_ab') {
+    let data = e.data;
+    data.cmd = 'think_ab';
+    workerthread2.postMessage(data);
+    return;
+  }
+  /* brother's thought */
+  if (cmd == 'think_ab') {
+    let data = e.data;
+    data.cmd = 'partial_ab';
+    workerthread.postMessage(data);
+    return;
+  }
   let hinto = e.data.hinto;
   let kyokumensu = e.data.kyokumensu;
   let duration = e.data.duration;
+  let hyoka = e.data.hyoka;
 
   let x = -1, y = -1;
   if (hinto != null) {
@@ -701,18 +807,20 @@ workerthread.onmessage = function(e)
     ++pass;
   }
 
-  kifu.value += movestr(cells, x, y, teban, tesuu, kyokumensu, duration);
+  kifu.value +=
+    movestr(
+      cells, x, y, teban, tesuu, kyokumensu,
+      duration, rfen_cur);
+  rfen_cur = toRFEN(cells, -teban);
 
   ++tesuu;
   // 手番変更
-  if (pass >= 2) {
+  if (pass >= 2 || checkfinished(cells)) {
     teban = BLANK;
-  } else {
-    if (teban == SENTE) {
-      teban = GOTE;
-    } else if (teban == GOTE) {
-      teban = SENTE;
-    }
+  } else if (teban == SENTE) {
+    teban = GOTE;
+  } else if (teban == GOTE) {
+    teban = SENTE;
   }
   draw();
   keiseibar(cells);
@@ -722,10 +830,17 @@ workerthread.onmessage = function(e)
   prgsm.style.display = 'none';
 
   if (atcommatchchk.checked == true && teban != BLANK) {
-    COMmoveR();
+    if (cmbmvtyp.value == 'all')
+      COMmoveR();
+    else if (cmbmvtyp.value == 'alphabeta')
+      COMmoveAB();
   } else {
     if (teban == BLANK) {
-      kifu.value += movestr(cells, -1, -1, teban, tesuu, 0, 0);
+      kifu.value +=
+        movestr(
+          cells, -1, -1, teban, tesuu,
+          0, 0, rfen_cur);
+      rfen_cur = toRFEN(cells, teban);
     }
   }
   if (hinto != null) {
@@ -744,6 +859,32 @@ workerthread.onmessage = function(e)
     hintt.value = str;
   }
   gotobottom(kifu);
+}
+
+workerthread2.onmessage = function (e) {
+  let cmd = e.data.cmd;
+  // finished searching.
+  if (cmd == 'think') {
+    let data = e.data;
+    data.cmd = 'partial';
+    workerthread.postMessage(data);
+    return;
+  }
+  if (cmd == 'think_ab') {
+    let data = e.data;
+    data.cmd = 'partial_ab';
+    workerthread.postMessage(data);
+    return;
+  }
+  if (cmd == 'evaltbl') {
+    let et = e.data.evaltbl;
+    hintt.value += '\n' + et.join(',');
+    return;
+  }
+  if (cmd == 'newevaltbl') {
+    initialized = true;
+    return;
+  }
 }
 
 /**
@@ -775,4 +916,235 @@ function copykifu()
 {
   kifu.select();
   document.execCommand('copy');
+}
+
+function showevaltbl()
+{
+  workerthread.postMessage({ cmd: 'evaltbl' });
+  workerthread2.postMessage({ cmd: 'evaltbl' });
+}
+
+function readkifu()
+{
+  btnread.disabled = true;
+
+  let result = kifu.value;
+  let lines = result.split('\n');
+  let moves = [];
+  let rfen = [];
+  for (let l of lines) {
+    let elem = l.split(' ');
+    moves.push(Number(elem[1]));
+    let rfenlet = elem.slice(-2);
+    rfen.push(rfenlet.join(' '));
+  }
+  // console.log("moves:" + moves.join(' '));
+
+  let output = NaN;
+  if (result.indexOf("●の勝ち") >= 0) {
+    // console.log("BLACK WON");
+    output = SENTE;
+  } else if (result.indexOf("◯の勝ち") >= 0) {
+    // console.log("WHITE WON");
+    output = GOTE;
+  } else if (result.indexOf("引き分け") >= 0) {
+    // console.log("DRAW");
+    output = 0;
+  } else {
+    // console.log("UNKNOWN");
+    return;
+  }
+  ntrain = rfen.length;
+  teban = GOTE;
+  let rfenfmt = /([1-8A-Ha-h]+\/){7}[1-8A-Ha-h]+ [bw]/;
+  for (let i = 0 ; i < rfen.length ; ++i) {
+    if (isNaN(moves[i]) || !rfenfmt.test(rfen[i])) {
+      --ntrain;
+      continue;
+    }
+
+    workerthread.postMessage(
+      {
+        cmd: 'train', cells: fromRFEN(rfen[i]),
+        teban: teban, output: output, eta: 0.001
+      }
+    );
+    teban = -teban;
+  }
+}
+
+const BLACKN = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '*',];
+const WHITEN = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', '*',];
+
+function toRFEN(cells, teban)
+{
+  let result = new Array(NUMCELL);
+  for (let i = 0; i < NUMCELL; ++i) {
+    let line = '';
+    let c = cells[i * NUMCELL];
+    let l = 0;
+    for (let j = 1; j < NUMCELL; ++j) {
+      if (c == cells[i * NUMCELL + j]) {
+        ++l;
+        continue;
+      }
+      if (c == SENTE) {
+        line += BLACKN[l];
+      } else if (c == GOTE) {
+        line += WHITEN[l];
+      } else if (c == BLANK) {
+        line += '' + (l + 1);
+      }
+      c = cells[i * NUMCELL + j];
+      l = 0;
+    }
+
+    if (c == SENTE) {
+      line += BLACKN[l];
+    } else if (c == GOTE) {
+      line += WHITEN[l];
+    } else if (c == BLANK) {
+      line += '' + (l + 1);
+    }
+    result[i] = line;
+  }
+
+  let t = ' f';
+  if (teban == SENTE) {
+    t = ' b';
+  } else if (teban == GOTE) {
+    t = ' w';
+  // } else if (c == BLANK) {
+  }
+  return result.join('/') + t;
+}
+
+const NBLACK = "ABCDEFGH";
+const NWHITE = "abcdefgh";
+
+function fromRFEN(rfen)
+{
+  let [n, t] = rfen.split(' ');
+
+  if (t == 'b') {
+    teban = SENTE;
+  } else if (t == 'w') {
+    teban = GOTE;
+  } else {
+    teban = BLANK;
+  }
+
+  let cells = new Array(CELL2D);
+  let icell = 0;
+
+  for (let i = 0; i < n.length; ++i) {
+    let ch = n[i];
+    let j = NBLACK.indexOf(ch);
+    if (j >= 0) {
+      while( j >= 0 ) {
+        cells[icell] = SENTE;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+    j = NWHITE.indexOf(ch);
+    if (j >= 0) {
+      while (j >= 0) {
+        cells[icell] = GOTE;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+    j = Number(ch);
+    if (!isNaN(j)) {
+      while (j > 0) {
+        cells[icell] = BLANK;
+        ++icell;
+        --j;
+      }
+      continue;
+    }
+  }
+  return cells;
+}
+
+function updateevaltbl()
+{
+  btnet.disables = true;
+  let et = hintt.value.split(',');
+  workerthread.postMessage({ cmd: 'newevaltbl', evaltbl: et });
+  workerthread2.postMessage({ cmd: 'newevaltbl', evaltbl: et });
+}
+
+function sendsynceval()
+{
+  initialized = false;
+  workerthread.postMessage({ cmd: 'evaltbl' });
+}
+
+window.addEventListener('load', function(){
+  // sendsynceval();
+  get_evaltabletxt();
+}, false);
+
+function applyrfen()
+{
+  if (enableclick == false)
+    return;
+
+  teban = BLANK;
+
+  let rfen = hintt.value;
+  let c = fromRFEN(rfen);
+
+  if (c.length != cells.length) return;
+
+  for (let i = 0; i < CELL2D; ++i)
+    cells[i] = c[i];
+
+  rfen_cur = rfen;
+
+  tesuu = 1;
+  pass = 0;
+
+  kifu.value = "";
+  inp.value = "";
+
+  draw();
+}
+
+function evaltabletxt_resp(status, resp)
+{
+  // var msg = document.getElementById('msg_l2f');
+  if (status === 0) {  // XHR 通信失敗
+    // msg.innerHTML += '[XHR 通信失敗]' + resp + '自動的にリロードします。';
+    // reloadlater();
+    return;
+  }
+  // XHR 通信成功
+  if ((200 <= status && status < 300) || status === 304) {
+    hintt.value = resp;
+    updateevaltbl();
+  } else {  // リクエスト失敗
+    window.alert('failed to get evaluation table.');
+  }
+  // reloadlater();
+}
+
+function get_evaltabletxt()
+{
+  var ajax = new XMLHttpRequest();
+  if (ajax === null)
+    return;
+  ajax.open('GET', './test/evaltable.txt');
+  ajax.send();
+  ajax.onreadystatechange = function () {
+    switch (ajax.readyState) {
+      case 4:
+        evaltabletxt_resp(ajax.status, ajax.responseText);
+        break;
+    }
+  };
 }
