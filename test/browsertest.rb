@@ -211,7 +211,7 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
-  DIV_RFENTABLE = 10
+  DIV_RFENTABLE = 11
 
   def run(idx)
     starttime = Time.now
