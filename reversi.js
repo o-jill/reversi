@@ -41,8 +41,8 @@ var tesuu = 1;
 var pass = 0;
 
 var enableclick = true;
-var workerthread = new Worker('reversi_engine.js?v005_1');
-var workerthread2 = new Worker('reversi_engine.js?v005_2');
+var workerthread = new Worker('reversi_engine.js?v006_1');
+var workerthread2 = new Worker('reversi_engine.js?v006_2');
 const prgs = document.getElementById('prgs');
 const prgsm = document.getElementById('prgs2');
 
