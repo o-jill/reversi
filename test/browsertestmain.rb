@@ -16,7 +16,7 @@ index = indexarr.size.zero? ? -1 : indexarr[0].slice(2, 10).to_i
 
 # main
 
-test = BrowserTest.new
+test = BrowserTest.new(ARGV)
 test.fold_begin('pages.1', 'pages tests')
 test.run(index)
 test.fold_end('pages.1')

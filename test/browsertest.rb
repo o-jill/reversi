@@ -11,9 +11,11 @@ require './test/extractrfen.rb'
 
 # test pages on a browser
 class BrowserTest < BrowserTestAbstract
-  def initialize
+  def initialize(options)
     super
     @winlose = {black: 0, white: 0, draw:0 }
+    @testtbl =
+      options.include?('--learning') ? %w[learning] : TESTTBL
   end
 
   attr_reader :gameurl
@@ -224,7 +226,7 @@ class BrowserTest < BrowserTestAbstract
     end
 
     puts "Started on #{starttime}"
-    TESTTBL.each do |test|
+    @testtbl.each do |test|
       unless methods(true).include?(test.to_sym)
         puts "unknown test name '#{test}'..."
         exit(-9999)
