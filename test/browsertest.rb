@@ -11,8 +11,11 @@ require './test/extractrfen.rb'
 
 # test pages on a browser
 class BrowserTest < BrowserTestAbstract
-  def initialize
+  def initialize(options)
     super
+    @winlose = {black: 0, white: 0, draw:0 }
+    @testtbl =
+      options.include?('--learning') ? %w[learning] : TESTTBL
   end
 
   attr_reader :gameurl
@@ -40,6 +43,18 @@ class BrowserTest < BrowserTestAbstract
     sleep 0.5
   end
 
+  def print_winrate
+    p @winlose
+  end
+
+  def countwinlose(kifu)
+    return @winlose[:black] = @winlose[:black] + 1 if kifu.rindex('●の勝ち')
+
+    return @winlose[:white] = @winlose[:white] + 1 if kifu.rindex('◯の勝ち')
+
+    @winlose[:draw] = @winlose[:draw] + 1
+  end
+
   def play(idx)
     clickbtn(:id, 'btninit')
     sleep 0.5
@@ -60,6 +75,8 @@ class BrowserTest < BrowserTestAbstract
 
       old = kifu
     end
+
+    countwinlose(kifu)
 
     path = format("kifu/kifu%09d.txt", idx)
     kifu2file(path, kifu)
@@ -89,13 +106,7 @@ class BrowserTest < BrowserTestAbstract
       break if kifu.include?('引き分け')
     end
 
-    # puts "button read"
-    # clickbtn(:id, 'btnread')
-    # loop do
-    #   elem = driver.find_element(:id, 'btnread')
-    #   break if elem.enabled?
-    #   sleep 0.5
-    # end
+    countwinlose(kifu)
 
     path = format("kifu/kifu%09d.txt", idx)
     puts path
@@ -202,7 +213,7 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
-  DIV_RFENTABLE = 10
+  DIV_RFENTABLE = 11
 
   def run(idx)
     starttime = Time.now
@@ -215,7 +226,7 @@ class BrowserTest < BrowserTestAbstract
     end
 
     puts "Started on #{starttime}"
-    TESTTBL.each do |test|
+    @testtbl.each do |test|
       unless methods(true).include?(test.to_sym)
         puts "unknown test name '#{test}'..."
         exit(-9999)
@@ -236,6 +247,8 @@ class BrowserTest < BrowserTestAbstract
     er.enumeratekifu.each do |path|
       er.extract(path)
     end
+
+    print_winrate
 
     # テストを終了する（ブラウザを終了させる）
     driver.quit
