@@ -611,7 +611,11 @@ function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
       node.hyoka = val.hyoka;
 //  console.log("updated!")
     } else if (alpha >= beta) {  // cut
-      // need freeing memory??
+      // メモリ解放のつもり
+      for (; i < node.child.length; ++i) {
+        child[i] = null;
+        node.child[i] = null;
+      }
       break;
     } else {
       // メモリ解放のつもり
