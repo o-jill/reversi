@@ -647,6 +647,30 @@ function shuffle(arr) {
 
 function sort_child(arr, c, teban)
 {
+  return sort_pos(arr);
+  // return scout_child(arr, c, teban);
+}
+
+const POS_ORDER_TBL = [
+  0, 3, 1, 2, 2, 1, 3, 0,
+  3, 3, 4, 4, 4, 4, 3, 3,
+  1, 4, 4, 4, 4, 4, 4, 1,
+  2, 4, 4, 4, 4, 4, 4, 2,
+  2, 4, 4, 4, 4, 4, 4, 2,
+  1, 4, 4, 4, 4, 4, 4, 1,
+  3, 3, 4, 4, 4, 4, 3, 3,
+  0, 3, 1, 2, 2, 1, 3, 0,
+];
+
+function sort_pos(arr)
+{
+  arr.sort(function (a, b) {
+    return POS_ORDER_TBL[a.x + a.y * 8] - POS_ORDER_TBL[b.x + b.y * 8]; });
+  return arr;
+}
+
+function scout_child(arr, c, teban)
+{
   if (arr.length <= 1) return arr;
 
   let values = new Array(arr.length);
