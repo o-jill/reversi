@@ -108,7 +108,7 @@ class BrowserTest < BrowserTestAbstract
 
     countwinlose(kifu)
 
-    path = format("kifu/kifu%09d.txt", idx)
+    path = format("kifu/kifu#{@section}%09d.txt", idx)
     puts path
     kifu2file(path, kifu)
     # puts "result:\n#{kifu}\n"
@@ -221,8 +221,10 @@ class BrowserTest < BrowserTestAbstract
     if idx >= 0 then
       # @rfentbl = RFENTBL.slice(idx * DIV_RFENTABLE, 1)
       @rfentbl = RFENTBL.slice(idx * DIV_RFENTABLE, DIV_RFENTABLE)
+      @section = idx
     else
       @rfentbl = RFENTBL
+      @section = ''
     end
 
     puts "Started on #{starttime}"
