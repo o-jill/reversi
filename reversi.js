@@ -275,6 +275,8 @@ function keiseibar(c)
   prgs.value = cnt+64;
 }
 
+const COLUMN = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
 function movestr(c, x, y, tb, ts, kms, tm, rfen)
 {
   let str = ts.toString(10) + "手目 ";
@@ -283,7 +285,8 @@ function movestr(c, x, y, tb, ts, kms, tm, rfen)
       str += "パス";
     }
   } else {
-    str += (x+1).toString(10) + (y+1).toString(10);
+    str += COLUMN[x] + (y + 1).toString(10);
+    // str += (x + 1).toString(10) + (y + 1).toString(10);
   }
 
   if (tb == SENTE) {
