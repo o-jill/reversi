@@ -188,7 +188,7 @@ class BrowserTest < BrowserTestAbstract
     # enumerate txt in kifu dir.
     list = enumeratekifu
 
-    100.times do |it|
+    10.times do |it|
       puts "#{it}/100 ..."
       # list[0..1].each do |path|
       list.shuffle.each do |path|
