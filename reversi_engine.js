@@ -229,7 +229,7 @@ function training(kyokumen, teban, bwin, eta)
   }
 
   // back to hidden
-  var diff = bwin == 1 ? sum - bwin : sum;
+  var diff = sum - bwin;
   // let diff = sum - bwin;
   for (let j = 0; j < 4; ++j) {
     evaltbl2[j + 4 * CELL2D + 8] -= hidsig[j] * diff * eta;
