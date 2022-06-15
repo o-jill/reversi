@@ -85,7 +85,7 @@ class BrowserTest < BrowserTestAbstract
   end
 
   def playr(idx, rfen)
-    puts "starting game #{idx}"
+    puts "starting game #{idx}/#{@rfentbl.size}"
     # clickbtn(:id, 'btninit')
     # sleep 0.5
     loadrfen(rfen)
