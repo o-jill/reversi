@@ -147,18 +147,20 @@ class BrowserTest < BrowserTestAbstract
     # puts "=====\n#{hintt.attribute(:value)}\n=====\n"
 
     # wait loading evaltable.txt
-    loop do
-      sleep 0.5
+    10.times do
+      sleep 0.2
       ret = driver.execute_script('return initialized == true;');
       p ret
-      break if ret
+      return nil if ret
     end
+    @res.failu
+    return -9999  # time out error
   end
 
   def simpleaccess
     simplecheck 'index.html'
 
-    load_evaltable
+    return -1 if load_evaltable
 
     clickbtn(:id, 'acmchk')
     clickbtn(:id, 'acmachk')
@@ -185,7 +187,7 @@ class BrowserTest < BrowserTestAbstract
   def learning
     simplecheck 'index.html'
 
-    load_evaltable
+    return -1 if load_evaltable
 
     # enumerate txt in kifu dir.
     list = enumeratekifu
