@@ -215,11 +215,13 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
+  NMAX = 20
+
   def run(idx)
     starttime = Time.now
 
     if idx >= 0 then
-      div_rfentable = RFENTBL.size / 10 + 1
+      div_rfentable = RFENTBL.size / NMAX + 1
       # @rfentbl = RFENTBL.slice(idx * div_rfentable, 1)
       @rfentbl = RFENTBL.slice(idx * div_rfentable, div_rfentable)
       @section = idx
