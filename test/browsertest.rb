@@ -84,6 +84,8 @@ class BrowserTest < BrowserTestAbstract
     puts File.read(path)
   end
 
+  SEC_TMOUT = 300
+
   def playr(idx, rfen)
     puts "starting game #{idx}/#{@rfentbl.size}"
     # clickbtn(:id, 'btninit')
@@ -93,6 +95,7 @@ class BrowserTest < BrowserTestAbstract
     clickbtn(:id, 'btncommvab')
     old = ""
     kifu = ""
+    same = 0
     loop do
       sleep 1
       kifu = getkifu
@@ -100,6 +103,14 @@ class BrowserTest < BrowserTestAbstract
       if old != kifu
         print kifu[old.size, kifu.size]
         old = kifu
+        same = 0
+      else
+        same += 1
+        if same >= SEC_TMOUT
+          puts "-- -- TIMEOUT -- --\nkifu:#{kifu}"
+          @res.failu
+          return 1
+        end
       end
 
       break if kifu.include?('の勝ち')
@@ -169,7 +180,7 @@ class BrowserTest < BrowserTestAbstract
     #   playr(idx, RFENTBL[RFENTBL.size-1])
     # end
     @rfentbl.each_with_index do |rfen, idx|
-      playr(idx, rfen)
+      return -2 if playr(idx, rfen)
     end
   end
 
