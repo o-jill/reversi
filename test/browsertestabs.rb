@@ -89,6 +89,7 @@ class BrowserTestAbstract
   # ボタンをクリック
   def clickbtn(key, val)
     driver.find_element(key, val).click
+    puts("click button #{val}")
   end
 
   # テスト結果の表示
