@@ -20,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['2.3', '2.4', '2.5', '2.6', '2.7']
-        kifu: ['-N3', '-N4']
+        ruby-version: ['2.3', '2.5', '2.7'] # , '2.4', '2.6'
+        kifu: ['-N12', '-N13', '-N14', '-N15']
     steps:
     - uses: actions/checkout@v2
     - name: Set current datetime as env variable

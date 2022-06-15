@@ -20,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['2.3', '2.4', '2.5', '2.6', '2.7']
-        kifu: ['-N8', '-N9']
+        ruby-version: ['2.3', '2.5', '2.7'] # , '2.4', '2.6'
+        kifu: ['-N16', '-N17', '-N18', '-N19']
 #    services:
 #      selenium:
 #        image: selenium/standalone-chrome:3.141.59-vanadium
