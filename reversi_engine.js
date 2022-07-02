@@ -601,7 +601,7 @@ function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
 // console.dir(node);
 
     // update alpha
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (alpha < -val.hyoka) alpha = -val.hyoka;
 
     if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
@@ -854,6 +854,7 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
   let celltmp = new Array(CELL2D);
   let sum = 0;
   let alpha = ALPHA_INIT;
+  let beta = BETA_INIT;
   for (let i = 0; i < node.child.length; ++i) {
     for (let j = 0; j < CELL2D; ++j) {
       celltmp[j] = c[j];
@@ -864,12 +865,13 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
 
     route_push(x, y);
     let val = genandeval_alphabeta(
-      child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+      child[i], celltmp, -teban, depth - 1, alpha, beta);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 
     route_pop(val.hyoka);
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (teban == SENTE && alpha < val.hyoka) alpha = val.hyoka;
+    else if (teban == GOTE && beta > val.hyoka) beta = val.hyoka;
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
@@ -967,6 +969,7 @@ function genandeval_partial_ab(child, c, teban, depth) {
   let celltmp = new Array(CELL2D);
   let sum = 0;
   let alpha = ALPHA_INIT;
+  let beta = BETA_INIT;
   for (let i = 0; i < child.length; ++i) {
     for (let j = 0; j < CELL2D; ++j) {
       celltmp[j] = c[j];
@@ -976,12 +979,13 @@ function genandeval_partial_ab(child, c, teban, depth) {
     celltmp = move(celltmp, x, y, teban);
 
     route_push(x, y);
-    let val = genandeval_alphabeta(child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+    let val = genandeval_alphabeta(child[i], celltmp, -teban, depth - 1, alpha, beta);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 
     route_pop(val.hyoka);
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (teban == SENTE && alpha < val.hyoka) alpha = val.hyoka;
+    else if (teban == GOTE && beta > val.hyoka) beta = val.hyoka;
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
