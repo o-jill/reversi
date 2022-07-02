@@ -201,7 +201,7 @@ function evaluate2(c, teban) {
     for (let i = 0; i < CELL2D; ++i) {
       sum1 += w1[i] * c[i];
     }
-    sum += w2[j] / (1 + Math.exp(sum1));
+    sum += w2[j] / (1 + Math.exp(-sum1));
   }
   // sum += fixedstones(c) * 10;
   //  console.info("leaf:%d", sum);
@@ -224,7 +224,7 @@ function training(kyokumen, teban, bwin, eta)
       sum1 += w1[i] * kyokumen[i];
     }
     hid[j] = sum1;
-    hidsig[j] = 1 / (1 + Math.exp(sum1));
+    hidsig[j] = 1 / (1 + Math.exp(-sum1));
     sum += w2[j] * hidsig[j];
   }
 
@@ -239,7 +239,7 @@ function training(kyokumen, teban, bwin, eta)
   var dhid = [0, 0, 0, 0, 0];
   for (let j = 0; j < 4; ++j) {
     let tmp = evaltbl2[j + 4 * CELL2D + 8] * diff;
-    let sig = 1 / (1 + Math.exp(hid[j]));
+    let sig = 1 / (1 + Math.exp(-hid[j]));
     dhid[j] = tmp * sig * (1 - sig);
   }
 
