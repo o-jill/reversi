@@ -575,6 +575,7 @@ function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
     route_pop(val.hyoka);
     return node;
   }
+  child = sort_child(child, c, teban);
   node.child = child;
 
   let celltmp = new Array(CELL2D);
