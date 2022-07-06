@@ -84,7 +84,7 @@ class BrowserTest < BrowserTestAbstract
     puts File.read(path)
   end
 
-  SEC_TMOUT = 300
+  SEC_TMOUT = 360
 
   def playr(idx, rfen)
     puts "starting game #{idx}/#{@rfentbl.size}"
