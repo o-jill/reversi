@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: ['3.0', '3.1']
-        kifu: ['-N5', '-N6', '-N7']
+        kifu: ['-N6', '-N7', '-N8', '-N9', '-N10', '-N11']
 #    services:
 #      selenium:
 #        image: selenium/standalone-chrome:3.141.59-vanadium

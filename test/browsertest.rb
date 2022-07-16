@@ -84,8 +84,10 @@ class BrowserTest < BrowserTestAbstract
     puts File.read(path)
   end
 
+  SEC_TMOUT = 600
+
   def playr(idx, rfen)
-    puts "starting game #{idx}"
+    puts "starting game #{idx}/#{@rfentbl.size}"
     # clickbtn(:id, 'btninit')
     # sleep 0.5
     loadrfen(rfen)
@@ -93,6 +95,7 @@ class BrowserTest < BrowserTestAbstract
     clickbtn(:id, 'btncommvab')
     old = ""
     kifu = ""
+    same = 0
     loop do
       sleep 1
       kifu = getkifu
@@ -100,6 +103,14 @@ class BrowserTest < BrowserTestAbstract
       if old != kifu
         print kifu[old.size, kifu.size]
         old = kifu
+        same = 0
+      else
+        same += 1
+        if same >= SEC_TMOUT
+          puts "-- -- TIMEOUT -- --\nkifu:#{kifu}"
+          @res.failu
+          return 1
+        end
       end
 
       break if kifu.include?('の勝ち')
@@ -147,18 +158,20 @@ class BrowserTest < BrowserTestAbstract
     # puts "=====\n#{hintt.attribute(:value)}\n=====\n"
 
     # wait loading evaltable.txt
-    loop do
-      sleep 0.5
+    10.times do
+      sleep 0.2
       ret = driver.execute_script('return initialized == true;');
       p ret
-      break if ret
+      return nil if ret
     end
+    @res.failu
+    return -9999  # time out error
   end
 
   def simpleaccess
     simplecheck 'index.html'
 
-    load_evaltable
+    return -1 if load_evaltable
 
     clickbtn(:id, 'acmchk')
     clickbtn(:id, 'acmachk')
@@ -167,7 +180,7 @@ class BrowserTest < BrowserTestAbstract
     #   playr(idx, RFENTBL[RFENTBL.size-1])
     # end
     @rfentbl.each_with_index do |rfen, idx|
-      playr(idx, rfen)
+      return -2 if playr(idx, rfen)
     end
   end
 
@@ -180,16 +193,18 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
+  ITERATION = 10
+
   def learning
     simplecheck 'index.html'
 
-    load_evaltable
+    return -1 if load_evaltable
 
     # enumerate txt in kifu dir.
     list = enumeratekifu
 
-    10.times do |it|
-      puts "#{it}/100 ..."
+    ITERATION.times do |it|
+      puts "#{it}/#{ITERATION} ..."
       # list[0..1].each do |path|
       list.shuffle.each do |path|
         puts "[#{path}]"
@@ -213,11 +228,13 @@ class BrowserTest < BrowserTestAbstract
     end
   end
 
+  NMAX = 20
+
   def run(idx)
     starttime = Time.now
 
     if idx >= 0 then
-      div_rfentable = RFENTBL.size / 10 + 1
+      div_rfentable = RFENTBL.size / NMAX + 1
       # @rfentbl = RFENTBL.slice(idx * div_rfentable, 1)
       @rfentbl = RFENTBL.slice(idx * div_rfentable, div_rfentable)
       @section = idx

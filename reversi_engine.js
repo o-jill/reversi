@@ -201,7 +201,7 @@ function evaluate2(c, teban) {
     for (let i = 0; i < CELL2D; ++i) {
       sum1 += w1[i] * c[i];
     }
-    sum += w2[j] / (1 + Math.exp(sum1));
+    sum += w2[j] / (1 + Math.exp(-sum1));
   }
   // sum += fixedstones(c) * 10;
   //  console.info("leaf:%d", sum);
@@ -224,12 +224,12 @@ function training(kyokumen, teban, bwin, eta)
       sum1 += w1[i] * kyokumen[i];
     }
     hid[j] = sum1;
-    hidsig[j] = 1 / (1 + Math.exp(sum1));
+    hidsig[j] = 1 / (1 + Math.exp(-sum1));
     sum += w2[j] * hidsig[j];
   }
 
   // back to hidden
-  var diff = bwin == 1 ? sum - bwin : sum;
+  var diff = sum - bwin;
   // let diff = sum - bwin;
   for (let j = 0; j < 4; ++j) {
     evaltbl2[j + 4 * CELL2D + 8] -= hidsig[j] * diff * eta;
@@ -239,7 +239,7 @@ function training(kyokumen, teban, bwin, eta)
   var dhid = [0, 0, 0, 0, 0];
   for (let j = 0; j < 4; ++j) {
     let tmp = evaltbl2[j + 4 * CELL2D + 8] * diff;
-    let sig = 1 / (1 + Math.exp(hid[j]));
+    let sig = 1 / (1 + Math.exp(-hid[j]));
     dhid[j] = tmp * sig * (1 - sig);
   }
 
@@ -575,6 +575,7 @@ function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
     route_pop(val.hyoka);
     return node;
   }
+  child = sort_child(child, c, teban);
   node.child = child;
 
   let celltmp = new Array(CELL2D);
@@ -601,7 +602,7 @@ function genandeval_alphabeta(node, c, teban, depth, alpha, beta)
 // console.dir(node);
 
     // update alpha
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (alpha < -val.hyoka) alpha = -val.hyoka;
 
     if (node.best == null || node.hyoka * teban < val.hyoka * teban) {
       // if (node.best != null) console.log(
@@ -854,6 +855,7 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
   let celltmp = new Array(CELL2D);
   let sum = 0;
   let alpha = ALPHA_INIT;
+  let beta = BETA_INIT;
   for (let i = 0; i < node.child.length; ++i) {
     for (let j = 0; j < CELL2D; ++j) {
       celltmp[j] = c[j];
@@ -864,12 +866,13 @@ function genandeval_shuffle_ab(node, c, teban, depth) {
 
     route_push(x, y);
     let val = genandeval_alphabeta(
-      child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+      child[i], celltmp, -teban, depth - 1, alpha, beta);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 
     route_pop(val.hyoka);
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (teban == SENTE && alpha < val.hyoka) alpha = val.hyoka;
+    else if (teban == GOTE && beta > val.hyoka) beta = val.hyoka;
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
@@ -967,6 +970,7 @@ function genandeval_partial_ab(child, c, teban, depth) {
   let celltmp = new Array(CELL2D);
   let sum = 0;
   let alpha = ALPHA_INIT;
+  let beta = BETA_INIT;
   for (let i = 0; i < child.length; ++i) {
     for (let j = 0; j < CELL2D; ++j) {
       celltmp[j] = c[j];
@@ -976,12 +980,13 @@ function genandeval_partial_ab(child, c, teban, depth) {
     celltmp = move(celltmp, x, y, teban);
 
     route_push(x, y);
-    let val = genandeval_alphabeta(child[i], celltmp, -teban, depth - 1, alpha, BETA_INIT);
+    let val = genandeval_alphabeta(child[i], celltmp, -teban, depth - 1, alpha, beta);
     child[i].hyoka = val.hyoka;
     sum += child[i].kyokumensu;
 
     route_pop(val.hyoka);
-    if (alpha < val.hyoka) alpha = val.hyoka;
+    if (teban == SENTE && alpha < val.hyoka) alpha = val.hyoka;
+    else if (teban == GOTE && beta > val.hyoka) beta = val.hyoka;
     //  console.log("node.hyoka*teban(%d) < val(%d)*teban(%d)(%d) @ d%d",
     //              node.hyoka*teban, val, teban, val*teban, depth);
     //  console.dir(node);
@@ -1213,165 +1218,109 @@ function move(c, x, y, t)
  */
 function checkreverse(c, xc, yc, color)
 {
-  let i, j = false;
-  let rev = false;
-  let val;
-
+  let i, val;
+ 
   // ←
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
     if (val == color) {
-      j = rev;
-      break;
+      if (i + 1 < xc) return true;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →
-  j = false;
-  rev = false;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
     if (val == color) {
-      j = rev;
+      if (xc + 1 < i) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ↑
-  j = false;
-  rev = false;
   for (i = yc ; i !== 0 ;) {
     --i;
     val = c[xc+NUMCELL*i];
     if (val == color) {
-      j = rev;
+      if (i + 1 < y) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ↓
-  j = false;
-  rev = false;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
     if (val == color) {
-      j = rev;
+      if (y + 1 < i) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ←↑
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc < i) {
       break;
     }
     val = c[xc-i+NUMCELL*(yc-i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →↑
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc < i) {
       break;
     }
     val = c[xc+i+NUMCELL*(yc-i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →↓
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
       break;
     }
     val = c[xc+i+NUMCELL*(yc+i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ←↓
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc+i >= NUMCELL) {
       break;
     }
     val = c[xc-i+NUMCELL*(yc+i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
   }
-  if (j) {
-    return true;
-  }
+
   return false;
 }
 
