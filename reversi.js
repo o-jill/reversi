@@ -674,7 +674,7 @@ function COMmoveAB()
   // prgs.style.display = 'none';
   prgsm.style.display = 'block';
 
-  workerthread.postMessage({ cmd: 'move_ab', cells: cells, teban: teban, depth: 10 });
+  workerthread.postMessage({ cmd: 'move_ab', cells: cells, teban: teban, depth: 9 });
 
   draw();
 }
