@@ -1218,165 +1218,109 @@ function move(c, x, y, t)
  */
 function checkreverse(c, xc, yc, color)
 {
-  let i, j = false;
-  let rev = false;
-  let val;
-
+  let i, val;
+ 
   // ←
   for (i = xc ; i !== 0 ;) {
     --i;
     val = c[i+NUMCELL*yc];
     if (val == color) {
-      j = rev;
-      break;
+      if (i + 1 < xc) return true;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →
-  j = false;
-  rev = false;
   for (i = xc+1 ; i < NUMCELL ; ++i) {
     val = c[i+NUMCELL*yc];
     if (val == color) {
-      j = rev;
+      if (xc + 1 < i) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ↑
-  j = false;
-  rev = false;
   for (i = yc ; i !== 0 ;) {
     --i;
     val = c[xc+NUMCELL*i];
     if (val == color) {
-      j = rev;
+      if (i + 1 < y) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ↓
-  j = false;
-  rev = false;
   for (i = yc+1 ; i < NUMCELL ; ++i) {
     val = c[xc+NUMCELL*i];
     if (val == color) {
-      j = rev;
+      if (y + 1 < i) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ←↑
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc < i) {
       break;
     }
     val = c[xc-i+NUMCELL*(yc-i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →↑
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc < i) {
       break;
     }
     val = c[xc+i+NUMCELL*(yc-i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // →↓
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc+i >= NUMCELL || yc+i >= NUMCELL) {
       break;
     }
     val = c[xc+i+NUMCELL*(yc+i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
-  }
-  if (j) {
-    return true;
   }
 
   // ←↓
-  j = false;
-  rev = false;
   for (i = 1 ; i < NUMCELL ; ++i) {
     if (xc < i || yc+i >= NUMCELL) {
       break;
     }
     val = c[xc-i+NUMCELL*(yc+i)];
     if (val == color) {
-      j = rev;
+      if (i > 1) return true;
       break;
     } else if (val == BLANK) {
       break;
-    } else {
-      rev = true;
     }
   }
-  if (j) {
-    return true;
-  }
+
   return false;
 }
 
